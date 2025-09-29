@@ -20,14 +20,14 @@
   <link rel="icon" href="/assets/favicon.png" />
   <style>
     :root{
-      --door-green:#1c6e6a; /* Grundfarbe wie Tür */
-      --door-green-2:#115150; /* dunkler */
-      --ink:#0f172a; /* Text dunkel */
-      --muted:#55636e; /* Sekundärtext */
+      --door-green:#1c6e6a;
+      --door-green-2:#115150;
+      --ink:#0f172a;
+      --muted:#55636e;
       --paper:#ffffff;
       --bg:#f5f7f8;
-      --accent:#c0392b; /* Rot vom Schild */
-      --accent-2:#e67e22; /* optionaler Buttonakzent */
+      --accent:#c0392b;
+      --accent-2:#e67e22;
       --radius:18px;
       --shadow:0 10px 30px rgba(0,0,0,.08);
     }
@@ -41,7 +41,7 @@
     .brand{display:flex;gap:.75rem;align-items:center}
     .brand .dot{width:14px;height:14px;border-radius:50%;background:var(--accent)}
     .brand strong{letter-spacing:.2px}
-    .cta{display:inline-block;background:var(--accent);color:white;padding:.9rem 1.15rem;border-radius:12px;font-weight:700;box-shadow:var(--shadow)}
+    .cta{display:inline-block;background:var(--accent);color:white;padding:.9rem 1.15rem;border-radius:12px;font-weight:700;box-shadow:var(--shadow);transition:transform 0.2s;}
     .cta.secondary{background:var(--door-green)}
     .cta:hover{transform:translateY(-1px)}
     .cta:active{transform:translateY(0)}
@@ -54,9 +54,15 @@
     h1{font-size:clamp(2rem, 2.6rem + .6vw, 3.2rem);line-height:1.08;margin:.4rem 0 1rem}
     .lead{font-size:1.1rem;opacity:.95}
     .hero .actions{display:flex;gap:1rem;flex-wrap:wrap;margin-top:1.4rem}
-    .mock{position:relative;aspect-ratio:3/4;border-radius:var(--radius);overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.08)}
-    .mock img{width:100%;height:100%;object-fit:cover;display:block}
-    .stamp{position:absolute;inset:auto 1rem 1rem auto;background:#fff;color:var(--ink);padding:.5rem .7rem;border-radius:10px;font-weight:700;box-shadow:var(--shadow)}
+
+    /* 3D Book */
+    .book-3d{width:280px;height:380px;background:linear-gradient(145deg, #2c5f5a, #1a4944);border-radius:12px;box-shadow:20px 20px 40px rgba(0,0,0,0.3), -10px -10px 20px rgba(255,255,255,0.1);position:relative;transform:perspective(1000px) rotateY(-15deg) rotateX(2deg);transition:transform 0.3s ease;}
+    .book-3d:hover{transform:perspective(1000px) rotateY(-10deg) rotateX(0deg);}
+    .book-cover{position:absolute;inset:15px;background:#fff;border-radius:8px;display:flex;flex-direction:column;justify-content:space-between;align-items:center;padding:20px;}
+    .book-title{font-size:1.1rem;font-weight:800;text-align:center;color:var(--accent);margin-top:10px;}
+    .book-icon{width:90px;height:90px;background:var(--door-green);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:2.5rem;}
+    .book-author{text-align:center;font-weight:600;color:var(--door-green);font-size:1rem;}
+    .book-stamp{position:absolute;bottom:10px;right:10px;background:white;padding:4px 8px;border-radius:6px;font-size:0.7rem;font-weight:700;color:var(--accent);box-shadow:0 2px 8px rgba(0,0,0,0.15);}
 
     /* SECTIONS */
     section{padding:clamp(2rem, 4vw, 4rem) 0}
@@ -72,7 +78,7 @@
     ul.clean li{display:grid;grid-template-columns:auto 1fr;gap:.6rem;align-items:start}
     .dot{width:.68rem;height:.68rem;border-radius:50%;background:var(--accent);margin-top:.45rem}
 
-    /* QUOTE / KLAPPENTEXT */
+    /* QUOTE */
     .quote{background:linear-gradient(160deg,#f8fafc, #eef5f5);border:1px solid #e6ecec}
     blockquote{margin:0;font-size:1.05rem}
 
@@ -95,14 +101,12 @@
     .cta-big h3{margin:.2rem 0 1rem}
   </style>
   <script>
-    // Smooth-scroll for anchor links in older browsers
     document.addEventListener('click', (e)=>{
       const a=e.target.closest('a[href^="#"]');
       if(!a) return; e.preventDefault();
       const el=document.querySelector(a.getAttribute('href')); if(el) el.scrollIntoView({behavior:'smooth'});
     });
   </script>
-  <!-- Structured Data -->
   <script type="application/ld+json">
   {
     "@context":"https://schema.org",
@@ -141,18 +145,37 @@
         <div>
           <span class="badge"><small>Praxisleitfaden · Door‑to‑Door</small></span>
           <h1>An Türen klopfen. Abgewiesen werden. Trotzdem weitermachen.</h1>
-          <p class="lead">„Vertreterbesuch unerwünscht“ zeigt, wie du ehrlich und souverän verkaufst, Ablehnung meisterst und im Außendienst gewinnst. Ohne Tricks, mit Klarheit, Ausdauer und Respekt.</p>
+          <p class="lead">„Vertreterbesuch unerwünscht" zeigt, wie du ehrlich und souverän verkaufst, Ablehnung meisterst und im Außendienst gewinnst. Ohne Tricks, mit Klarheit, Ausdauer und Respekt.</p>
+          
+          <!-- Stats Counter -->
+          <div style="display:flex;gap:2.5rem;margin:2rem 0;flex-wrap:wrap;">
+            <div style="text-align:left;">
+              <div style="font-size:2.5rem;font-weight:800;color:#4fc3f7;">250+</div>
+              <div style="font-size:0.95rem;opacity:0.85;">Verträge pro Monat</div>
+            </div>
+            <div style="text-align:left;">
+              <div style="font-size:2.5rem;font-weight:800;color:#4fc3f7;">10+</div>
+              <div style="font-size:0.95rem;opacity:0.85;">Jahre Praxis</div>
+            </div>
+            <div style="text-align:left;">
+              <div style="font-size:2.5rem;font-weight:800;color:#4fc3f7;">27</div>
+              <div style="font-size:0.95rem;opacity:0.85;">Verträge an einem Tag</div>
+            </div>
+          </div>
+          
           <div class="actions">
             <a class="cta" href="https://www.amazon.de/dp/DEINE-ASIN" target="_blank" rel="noopener noreferrer">Jetzt bei Amazon bestellen</a>
             <a class="cta secondary" href="#leseprobe">Leseprobe</a>
           </div>
         </div>
         <div>
-          <figure class="mock" aria-label="Buchcover">
-            <!-- Ersetze src durch deinen Pfad: /assets/Cover-final.jpg -->
-            <img loading="lazy" src="/assets/cover-final.jpg" alt="Buchcover: Vertreterbesuch unerwünscht – Daniel Lahmer">
-            <figcaption class="stamp">Neu · 1. Auflage</figcaption>
-          </figure>
+          <!-- 3D Book Mockup -->
+          <div style="display:flex;justify-content:center;align-items:center;">
+            <div class="book-3d">
+              <img src="/assets/Cover-final.JPEG" alt="Buchcover: Vertreterbesuch unerwünscht – Daniel Lahmer" style="position:absolute;inset:15px;border-radius:8px;width:calc(100% - 30px);height:calc(100% - 30px);object-fit:cover;">
+              <div class="book-stamp">Neu · 1. Auflage</div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -162,12 +185,12 @@
       <div class="container">
         <h2 id="kurz-title" class="section-title">Warum dieses Buch?</h2>
         <div class="card">
-          <p>🚪 Abgelehnt, ignoriert, ausgelacht – so fühlt sich Door‑to‑Door oft an. „Vertreterbesuche unerwünscht“ zeigt, wie du trotzdem souverän bleibst, mehr Abschlüsse holst und im Außendienst wirklich erfolgreich wirst. Ein ehrlicher Praxisleitfaden mit Storys, die packen, und Strategien, die sofort wirken. Für Verkäufer, die mehr wollen als billige Sprüche.</p>
+          <p>🚪 Abgelehnt, ignoriert, ausgelacht – so fühlt sich Door‑to‑Door oft an. „Vertreterbesuche unerwünscht" zeigt, wie du trotzdem souverän bleibst, mehr Abschlüsse holst und im Außendienst wirklich erfolgreich wirst. Ein ehrlicher Praxisleitfaden mit Storys, die packen, und Strategien, die sofort wirken. Für Verkäufer, die mehr wollen als billige Sprüche.</p>
         </div>
       </div>
     </section>
 
-    <!-- PROBLEME / LÖSUNGEN / WAS DU BEKOMMST -->
+    <!-- PROBLEME / LÖSUNGEN -->
     <section id="kapitel" aria-labelledby="benefits-title">
       <div class="container grid two">
         <div class="card">
@@ -202,7 +225,7 @@
       </div>
     </section>
 
-    <!-- KLAPPENTEXT / RÜCKSEITE als Zitat -->
+    <!-- KLAPPENTEXT -->
     <section aria-labelledby="quote-title">
       <div class="container card quote">
         <h2 id="quote-title" class="section-title">Worum es wirklich geht</h2>
@@ -213,7 +236,7 @@
       </div>
     </section>
 
-    <!-- LESEPROBE (PDF) -->
+    <!-- LESEPROBE -->
     <section id="leseprobe" aria-labelledby="leseprobe-title">
       <div class="container grid two">
         <div class="card">
@@ -235,7 +258,7 @@
       </div>
     </section>
 
-    <!-- ÜBER DEN AUTOR -->
+    <!-- AUTOR -->
     <section id="autor" aria-labelledby="autor-title">
       <div class="container card">
         <div class="author">
@@ -251,14 +274,14 @@
       </div>
     </section>
 
-    <!-- TESTIMONIALS (Platzhalter) -->
+    <!-- TESTIMONIALS -->
     <section aria-labelledby="reviews-title">
       <div class="container">
         <h2 id="reviews-title" class="section-title">Stimmen zum Buch</h2>
         <div class="grid three">
-          <div class="card"><p>„Direkt anwendbar. Schon nach dem ersten Kapitel bessere Gespräche geführt.“<br><small class="muted">— Leserfeedback</small></p></div>
-          <div class="card"><p>„Ehrlich, ohne Floskeln. Genau das, was im Außendienst gefehlt hat.“<br><small class="muted">— Teamleiter Energievertrieb</small></p></div>
-          <div class="card"><p>„Endlich Praxis statt Parolen. Must‑read für jeden, der an Türen klingelt.“<br><small class="muted">— Vertriebscoach</small></p></div>
+          <div class="card"><p>„Direkt anwendbar. Schon nach dem ersten Kapitel bessere Gespräche geführt."<br><small class="muted">— Leserfeedback</small></p></div>
+          <div class="card"><p>„Ehrlich, ohne Floskeln. Genau das, was im Außendienst gefehlt hat."<br><small class="muted">— Teamleiter Energievertrieb</small></p></div>
+          <div class="card"><p>„Endlich Praxis statt Parolen. Must‑read für jeden, der an Türen klingelt."<br><small class="muted">— Vertriebscoach</small></p></div>
         </div>
       </div>
     </section>
@@ -272,7 +295,7 @@
       </div>
     </section>
 
-    <!-- KURSE / BONUS -->
+    <!-- KURSE -->
     <section id="kurse" aria-labelledby="kurs-title">
       <div class="container grid two">
         <div class="card">
@@ -306,7 +329,7 @@
           <p>Nein. Beispiele stammen häufig aus Energie/Telekommunikation, die Prinzipien funktionieren in jedem Door‑to‑Door‑Kontext.</p>
         </details>
         <details>
-          <summary>Brauche ich „verkäuferisches Talent“?</summary>
+          <summary>Brauche ich „verkäuferisches Talent"?</summary>
           <p>Du brauchst Systeme. Das Buch zeigt dir, wie du Gespräche führst, Einwände entkräftest und zu klaren Abschlüssen leitest.</p>
         </details>
         <details>
