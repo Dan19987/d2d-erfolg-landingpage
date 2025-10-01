@@ -6,25 +6,21 @@
   <title>Vertreterbesuch unerwünscht – D2D-Erfolg | Daniel Lahmer</title>
   <meta name="description" content="Ehrlicher Praxisleitfaden für Door-to-Door-Vertrieb: Ablehnung meistern, souverän verkaufen, Abschlüsse steigern. Von Daniel Lahmer." />
   <meta name="robots" content="index,follow" />
-  
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Vertreterbesuch unerwünscht – D2D-Erfolg" />
   <meta property="og:description" content="Ehrlicher Praxisleitfaden für Door-to-Door-Vertrieb. Ablehnung meistern, souverän verkaufen, Abschlüsse steigern." />
   <meta property="og:image" content="/assets/cover-og.jpg" />
   <meta property="og:url" content="https://d2d-erfolg.de/" />
-  
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Vertreterbesuch unerwünscht – D2D-Erfolg" />
   <meta name="twitter:description" content="Praxisleitfaden für Door-to-Door-Vertrieb von Daniel Lahmer." />
   <meta name="twitter:image" content="/assets/cover-og.jpg" />
-  
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
   <link rel="manifest" href="/assets/site.webmanifest">
-  
   <style>
     :root{
       --door-green:#1c6e6a;
@@ -52,7 +48,7 @@
     .cta.secondary{background:var(--door-green)}
     .cta:hover{transform:translateY(-1px)}
     .cta:active{transform:translateY(0)}
-    
+
     /* HERO */
     .hero{isolation:isolate;background:linear-gradient(145deg, color-mix(in oklab, var(--door-green) 78%, #0a0 0%), var(--door-green-2));color:white;}
     .hero .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:3rem;align-items:center;padding:clamp(2.2rem, 3.5vw, 4rem) 0}
@@ -61,93 +57,81 @@
     h1{font-size:clamp(2rem, 2.6rem + .6vw, 3.2rem);line-height:1.08;margin:.4rem 0 1rem}
     .lead{font-size:1.1rem;opacity:.95}
     .hero .actions{display:flex;gap:1rem;flex-wrap:wrap;margin-top:1.4rem}
-    
+
     /* 3D Book */
     .book-3d{width:280px;height:380px;background:linear-gradient(145deg, #2c5f5a, #1a4944);border-radius:12px;box-shadow:20px 20px 40px rgba(0,0,0,0.3), -10px -10px 20px rgba(255,255,255,0.1);position:relative;transform:perspective(1000px) rotateY(-15deg) rotateX(2deg);transition:transform 0.3s ease;}
     .book-3d:hover{transform:perspective(1000px) rotateY(-10deg) rotateX(0deg);}
+    .book-cover{position:absolute;inset:15px;background:#fff;border-radius:8px;display:flex;flex-direction:column;justify-content:space-between;align-items:center;padding:20px;}
+    .book-title{font-size:1.1rem;font-weight:800;text-align:center;color:var(--accent);margin-top:10px;}
+    .book-icon{width:90px;height:90px;background:var(--door-green);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:2.5rem;}
+    .book-author{text-align:center;font-weight:600;color:var(--door-green);font-size:1rem;}
     .book-stamp{position:absolute;bottom:10px;right:10px;background:white;padding:4px 8px;border-radius:6px;font-size:0.7rem;font-weight:700;color:var(--accent);box-shadow:0 2px 8px rgba(0,0,0,0.15);}
-    
+
     /* SECTIONS */
     section{padding:clamp(2rem, 4vw, 4rem) 0}
     .grid{display:grid;gap:1.25rem}
     .two{grid-template-columns:repeat(2,1fr)}
     .three{grid-template-columns:repeat(3,1fr)}
     @media (max-width: 880px){.hero .wrap{grid-template-columns:1fr}.two,.three{grid-template-columns:1fr}}
-    
+
     .card{background:var(--paper);border-radius:var(--radius);box-shadow:var(--shadow);padding:1.25rem}
     .section-title{font-size:clamp(1.6rem, 1.2rem + .8vw, 2rem);margin:0 0 .6rem}
     .muted{color:var(--muted)}
     ul.clean{list-style:none;padding:0;margin:0;display:grid;gap:.75rem}
     ul.clean li{display:grid;grid-template-columns:auto 1fr;gap:.6rem;align-items:start}
     .dot{width:.68rem;height:.68rem;border-radius:50%;background:var(--accent);margin-top:.45rem}
-    
+
     /* QUOTE */
     .quote{background:linear-gradient(160deg,#f8fafc, #eef5f5);border:1px solid #e6ecec}
     blockquote{margin:0;font-size:1.05rem}
-    
+
     /* AUTHOR */
     .author{display:grid;grid-template-columns:120px 1fr;gap:1rem;align-items:center}
-    .author img{width:120px;height:120px;border-radius:50%;object-fit:cover;object-position:center 50%;border:4px solid #fff;box-shadow:var(--shadow)}
-    
+.author img{width:120px;height:120px;border-radius:50%;object-fit:cover;object-position:center 50%;border:4px solid #fff;box-shadow:var(--shadow)}
+
     /* FAQ */
     details{background:var(--paper);border-radius:12px;padding:1rem;border:1px solid #eef1f4}
     summary{cursor:pointer;font-weight:700}
     details+details{margin-top:.75rem}
-    
+
     /* FOOTER */
     footer{background:var(--door-green-2);color:#e6f3f2;padding:2rem 0}
     .foot{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
     .foot a{opacity:.9}
     .foot a:hover{opacity:1}
-    
+
     .cta-big{display:grid;place-items:center;background:linear-gradient(145deg, var(--door-green), var(--door-green-2));color:#fff;padding:2rem;border-radius:var(--radius);text-align:center}
     .cta-big h3{margin:.2rem 0 1rem}
-    
-    /* GAME MODAL */
-    .game-modal{display:none;position:fixed;inset:0;background:rgba(15,23,42,0.95);backdrop-filter:blur(8px);z-index:9999;animation:fadeIn 0.3s ease;}
-    .game-modal.show{display:block;}
-    .game-modal-close{position:absolute;top:20px;right:20px;width:40px;height:40px;background:rgba(255,255,255,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:24px;cursor:pointer;z-index:10000;transition:background 0.2s;}
-    .game-modal-close:hover{background:rgba(239,68,68,0.8);}
-    #gameFrame{width:100%;height:100%;border:none;}
-    @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
   </style>
-  
   <script>
     document.addEventListener('click', (e)=>{
       const a=e.target.closest('a[href^="#"]');
       if(!a) return; e.preventDefault();
-      const el=document.querySelector(a.getAttribute('href')); 
-      if(el) el.scrollIntoView({behavior:'smooth'});
+      const el=document.querySelector(a.getAttribute('href')); if(el) el.scrollIntoView({behavior:'smooth'});
     });
   </script>
-  
-  <!-- JSON-LD KORRIGIERT -->
   <script type="application/ld+json">
   {
-    "@context": "https://schema.org",
-    "@type": "Book",
-    "name": "Vertreterbesuch unerwünscht – Door-to-Door im Außendienst meistern",
-    "author": { "@type": "Person", "name": "Daniel Lahmer" },
-    "inLanguage": "de",
-    "bookFormat": "EBook",
-    "url": "https://d2d-erfolg.de/",
-    "image": "https://d2d-erfolg.de/assets/cover-og.jpg",
-    "description": "Ehrlicher Praxisleitfaden für Door-to-Door-Vertrieb: Ablehnung meistern, souverän verkaufen, Abschlüsse steigern.",
-    "offers": {
-      "@type": "Offer",
-      "availability": "https://schema.org/InStock",
-      "priceCurrency": "EUR",
-      "url": "https://www.amazon.de/dp/DEINE-ASIN"
-    }
-  }
+    "@context":"https://schema.org",
+    "@type":"Book",
+    "name":"Vertreterbesuch unerwünscht – Door-to-Door im Außendienst meistern",
+    "author":{"@type":"Person","name":"Daniel Lahmer"},
+    "inLanguage":"de",
+    "bookFormat":"EBook",
+    "url":"https://d2d-erfolg.de/",
+    "image":"https://d2d-erfolg.de/assets/cover-og.jpg",
+    "description":"Ehrlicher Praxisleitfaden für Door-to-Door-Vertrieb: Ablehnung meistern, souverän verkaufen, Abschlüsse steigern.",
+    "offers": {"@type":"Offer","availability":"https://schema.org/InStock","priceCurrency":"EUR","url":"https://www.amazon.de/dp/DEINE-ASIN"}
+
+
   </script>
 </head>
 <body>
   <header>
     <div class="container nav">
-      <a href="#top" class="brand" aria-label="Startseite">
-        <img src="/assets/d2d-logo.png" alt="D2D-Erfolg Logo" style="height:50px;width:auto;">
-      </a>
+<a href="#top" class="brand" aria-label="Startseite">
+  <img src="/assets/d2d-logo.png" alt="D2D-Erfolg Logo" style="height:50px;width:auto;">
+</a>
       <nav aria-label="Hauptnavigation" style="display:flex;gap:1rem;align-items:center;">
         <a href="#kapitel">Inhalte</a>
         <a href="#autor">Autor</a>
@@ -277,20 +261,20 @@
       </div>
     </section>
 
-    <!-- INTERAKTIVES TRAINING -->
-    <section aria-label="Interaktives Training">
-      <div class="container">
-        <div class="card" style="text-align:center; padding:2.5rem">
-          <h2 style="margin-top:0">🎮 Interaktives D2D-Training</h2>
-          <p style="color:var(--muted); margin:1rem 0 1.5rem">
-            Teste dein Wissen in realistischen Verkaufssituationen – direkt im Browser, keine Installation nötig.
-          </p>
-          <button class="cta" onclick="openGameModal()">
-            Jetzt Training starten
-          </button>
-        </div>
-      </div>
-    </section>
+<section aria-label="Interaktives Training">
+  <div class="container">
+    <div class="card" style="text-align:center; padding:2.5rem">
+      <h2 style="margin-top:0">🎮 Interaktives D2D-Training</h2>
+      <p style="color:var(--muted); margin:1rem 0 1.5rem">
+        Teste dein Wissen in realistischen Verkaufssituationen – 
+        direkt im Browser, keine Installation nötig.
+      </p>
+      <button class="cta" onclick="openGameModal()">
+        Jetzt Training starten
+      </button>
+    </div>
+  </div>
+</section>
 
     <!-- AUTOR -->
     <section id="autor" aria-labelledby="autor-title">
@@ -329,7 +313,7 @@
       </div>
     </section>
 
-    <!-- KURSE MIT KORRIGIERTEM FORMULAR -->
+<!-- KURSE -->
     <section id="kurse" aria-labelledby="kurs-title">
       <div class="container grid two">
         <div class="card">
@@ -345,7 +329,6 @@
           <h3 class="section-title" style="font-size:1.2rem">Warteliste</h3>
           <p>Trag dich ein und erhalte frühen Zugriff sowie Bonusmaterial.</p>
           
-          <!-- EINZIGES FORMULAR MIT HONEYPOT -->
           <form id="waitlistForm" style="display:grid;gap:.6rem">
             <label for="email" class="muted">E-Mail</label>
             <input 
@@ -356,8 +339,6 @@
               placeholder="dein.name@mail.de" 
               style="padding:.9rem;border:1px solid #d7dde2;border-radius:12px"
             />
-            <!-- Honeypot: bleibt leer -->
-            <input type="text" id="website" name="website" style="display:none" autocomplete="off" />
             
             <button 
               class="cta" 
@@ -382,6 +363,59 @@
       </div>
     </section>
 
+    <script>
+    (function() {
+      const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxkzGaYtVh68GbSuHuFBAyihp8KMv8B6NFcHPB4iip-HN0VhKZDsMNvMFMmf2utqA31/exec';
+      
+      const form = document.getElementById('waitlistForm');
+      if (!form) return;
+      
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const email = document.getElementById('email').value;
+        const btn = document.getElementById('submitBtn');
+        const msg = document.getElementById('formMessage');
+        
+        // Button deaktivieren
+        btn.disabled = true;
+        btn.textContent = 'Wird gesendet...';
+        msg.style.display = 'none';
+        
+        try {
+          const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: new URLSearchParams({
+              email: email,
+              source: 'homepage-warteliste'
+            })
+          });
+          
+          const data = await response.json();
+          
+          msg.style.display = 'block';
+          if (data.success) {
+            msg.style.background = '#d1fae5';
+            msg.style.color = '#065f46';
+            msg.textContent = '✓ ' + data.message;
+            form.reset();
+          } else {
+            throw new Error(data.message);
+          }
+          
+        } catch (error) {
+          msg.style.display = 'block';
+          msg.style.background = '#fee2e2';
+          msg.style.color = '#991b1b';
+          msg.textContent = '✗ ' + (error.message || 'Fehler. Bitte erneut versuchen.');
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Zur Warteliste';
+        }
+      });
+    })();
+    </script>
+
     <!-- FAQ -->
     <section aria-labelledby="faq-title">
       <div class="container">
@@ -402,123 +436,102 @@
     </section>
   </main>
 
-  <footer>
-    <div class="container foot">
-      <div class="brand">
-        <img src="/assets/d2d-logo-light.png" alt="D2D-Erfolg Logo" style="height:50px;width:auto;">
-      </div>
-      <div style="display:flex;gap:1rem;flex-wrap:wrap">
-        <a href="#top">Nach oben</a>
-        <a href="/impressum.html">Impressum</a>
-        <a href="/datenschutz.html">Datenschutz</a>
-        <a href="mailto:kontakt@d2d-erfolg.de">Kontakt</a>
-      </div>
+<footer>
+  <div class="container foot">
+    <div class="brand">
+      <img src="/assets/d2d-logo-light.png" alt="D2D-Erfolg Logo" style="height:50px;width:auto;">
     </div>
-  </footer>
-
-  <!-- GAME MODAL -->
-  <div id="gameModal" class="game-modal">
-    <div class="game-modal-close" onclick="closeGameModal()">✕</div>
-    <iframe id="gameFrame" src="" frameborder="0"></iframe>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap">
+      <a href="#top">Nach oben</a>
+      <a href="/impressum.html">Impressum</a>
+      <a href="/datenschutz.html">Datenschutz</a>
+      <a href="mailto:kontakt@d2d-erfolg.de">Kontakt</a>
+    </div>
   </div>
+</footer>
+  }
 
-  <!-- FORMULAR JAVASCRIPT -->
-  <script>
-  (function() {
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxkzGaYtVh68GbSuHuFBAyihp8KMv8B6NFcHPB4iip-HN0VhKZDsMNvMFMmf2utqA31/exec';
-    const TOKEN = 'D2D$2025!Warteliste#SecretUltimateKey'; // identisch zu FORM_TOKEN
+<!-- ========== GAME MODAL ========== -->
+<div id="gameModal" class="game-modal">
+  <div class="game-modal-close" onclick="closeGameModal()">✕</div>
+  <iframe id="gameFrame" src="" frameborder="0"></iframe>
+</div>
 
-    const form = document.getElementById('waitlistForm');
-    const emailEl = document.getElementById('email');
-    const btn = document.getElementById('submitBtn');
-    const msg = document.getElementById('formMessage');
+<style>
+.game-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  animation: fadeIn 0.3s ease;
+}
+.game-modal.show { display: block; }
+.game-modal-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 10000;
+  transition: background 0.2s;
+}
+.game-modal-close:hover {
+  background: rgba(239, 68, 68, 0.8);
+}
+#gameFrame {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+</style>
 
-    if (!form) return;
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
+<script>
+(function () {
+  const modal = document.getElementById('gameModal');
+  const frame  = document.getElementById('gameFrame');
 
-      // Mini-Validierung vorneweg
-      const email = emailEl.value.trim().toLowerCase();
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        showMsg('✗ Ungültige E-Mail-Adresse.', false);
-        return;
-      }
+  function openGameModal(url) {
+    frame.src = url || '/tuerspiel.html';  // Mit führendem Slash!
+    modal.classList.add('show');
+    document.documentElement.style.overflow = 'hidden';
+  }
 
-      btn.disabled = true;
-      btn.textContent = 'Wird gesendet...';
-      msg.style.display = 'none';
+  function closeGameModal() {
+    modal.classList.remove('show');
+    frame.src = 'about:blank';
+    document.documentElement.style.overflow = '';
+  }
 
-      // Honeypot bewusst leer lassen
-      const website = '';
+  // Hash-Support für Direktlink
+  if (window.location.hash === '#spiel') {
+    openGameModal();
+  }
 
-      try {
-        const body = new URLSearchParams({
-          email,
-          website, // Honeypot
-          token: TOKEN, // wichtig!
-          source: 'homepage-warteliste'
-        });
+  // ESC-Taste zum Schließen
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeGameModal();
+  });
 
-        const res = await fetch(SCRIPT_URL, { method: 'POST', body });
-        const isJson = res.headers.get('content-type')?.includes('application/json');
-        const data = isJson ? await res.json() : { success: false, message: await res.text() };
+  // Global verfügbar machen
+  window.openGameModal = openGameModal;
+  window.closeGameModal = closeGameModal;
+})();
+</script>
 
-        if (res.ok && data.success) {
-          showMsg('✓ ' + (data.message || 'Erfolgreich angemeldet!'), true);
-          form.reset();
-        } else {
-          throw new Error(data.message || 'Fehler. Bitte erneut versuchen.');
-        }
-      } catch (err) {
-        showMsg('✗ ' + (err.message || 'Fehler. Bitte erneut versuchen.'), false);
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Zur Warteliste';
-      }
-    });
-
-    function showMsg(text, ok) {
-      msg.style.display = 'block';
-      msg.style.background = ok ? '#d1fae5' : '#fee2e2';
-      msg.style.color = ok ? '#065f46' : '#991b1b';
-      msg.textContent = text;
-    }
-  })();
-  </script>
-
-  <!-- GAME MODAL JAVASCRIPT -->
-  <script>
-  (function () {
-    const modal = document.getElementById('gameModal');
-    const frame = document.getElementById('gameFrame');
-
-    function openGameModal(url) {
-      frame.src = url || '/tuerspiel.html';
-      modal.classList.add('show');
-      document.documentElement.style.overflow = 'hidden';
-    }
-
-    function closeGameModal() {
-      modal.classList.remove('show');
-      frame.src = 'about:blank';
-      document.documentElement.style.overflow = '';
-    }
-
-    // Hash-Support für Direktlink
-    if (window.location.hash === '#spiel') {
-      openGameModal();
-    }
-
-    // ESC-Taste zum Schließen
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeGameModal();
-    });
-
-    // Global verfügbar machen
-    window.openGameModal = openGameModal;
-    window.closeGameModal = closeGameModal;
-  })();
-  </script>
 </body>
 </html>
