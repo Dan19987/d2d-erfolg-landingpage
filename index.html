@@ -122,7 +122,8 @@
     "image":"https://d2d-erfolg.de/assets/cover-og.jpg",
     "description":"Ehrlicher Praxisleitfaden für Door-to-Door-Vertrieb: Ablehnung meistern, souverän verkaufen, Abschlüsse steigern.",
     "offers": {"@type":"Offer","availability":"https://schema.org/InStock","priceCurrency":"EUR","url":"https://www.amazon.de/dp/DEINE-ASIN"}
-  }
+
+
   </script>
 </head>
 <body>
@@ -260,6 +261,21 @@
       </div>
     </section>
 
+<section aria-label="Interaktives Training">
+  <div class="container">
+    <div class="card" style="text-align:center; padding:2.5rem">
+      <h2 style="margin-top:0">🎮 Interaktives D2D-Training</h2>
+      <p style="color:var(--muted); margin:1rem 0 1.5rem">
+        Teste dein Wissen in realistischen Verkaufssituationen – 
+        direkt im Browser, keine Installation nötig.
+      </p>
+      <button class="cta" onclick="openGameModal()">
+        Jetzt Training starten
+      </button>
+    </div>
+  </div>
+</section>
+
     <!-- AUTOR -->
     <section id="autor" aria-labelledby="autor-title">
       <div class="container card">
@@ -297,7 +313,7 @@
       </div>
     </section>
 
-    <!-- KURSE -->
+<!-- KURSE -->
     <section id="kurse" aria-labelledby="kurs-title">
       <div class="container grid two">
         <div class="card">
@@ -312,15 +328,93 @@
         <div class="card">
           <h3 class="section-title" style="font-size:1.2rem">Warteliste</h3>
           <p>Trag dich ein und erhalte frühen Zugriff sowie Bonusmaterial.</p>
-          <form action="https://formspree.io/f/your-id" method="POST" style="display:grid;gap:.6rem" autocomplete="email">
+          
+          <form id="waitlistForm" style="display:grid;gap:.6rem">
             <label for="email" class="muted">E-Mail</label>
-            <input id="email" name="email" type="email" required placeholder="dein.name@mail.de" style="padding:.9rem;border:1px solid #d7dde2;border-radius:12px" />
-            <button class="cta" type="submit" style="border:0;cursor:pointer">Zur Warteliste</button>
-            <small class="muted">Mit Absenden erklärst du dich mit der Verarbeitung deiner Daten zum Zweck der Kontaktaufnahme einverstanden.</small>
+            <input 
+              id="email" 
+              name="email" 
+              type="email" 
+              required 
+              placeholder="dein.name@mail.de" 
+              style="padding:.9rem;border:1px solid #d7dde2;border-radius:12px"
+            />
+            
+            <button 
+              class="cta" 
+              type="submit" 
+              style="border:0;cursor:pointer"
+              id="submitBtn"
+            >
+              Zur Warteliste
+            </button>
+            
+            <div 
+              id="formMessage" 
+              style="display:none;padding:12px;border-radius:8px;text-align:center;font-weight:600"
+            ></div>
+            
+            <small class="muted">
+              Mit Absenden erklärst du dich mit der Verarbeitung deiner Daten zum Zweck 
+              der Kontaktaufnahme einverstanden.
+            </small>
           </form>
         </div>
       </div>
     </section>
+
+    <script>
+    (function() {
+      const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyHLCc_4qCRtnyBVF3lp5QSuWOiFcKBBdqCBrNMc22W39Q2uTOMIx7UQM3-0Hfjubfw/exec';
+      
+      const form = document.getElementById('waitlistForm');
+      if (!form) return;
+      
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const email = document.getElementById('email').value;
+        const btn = document.getElementById('submitBtn');
+        const msg = document.getElementById('formMessage');
+        
+        // Button deaktivieren
+        btn.disabled = true;
+        btn.textContent = 'Wird gesendet...';
+        msg.style.display = 'none';
+        
+        try {
+          const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: new URLSearchParams({
+              email: email,
+              source: 'homepage-warteliste'
+            })
+          });
+          
+          const data = await response.json();
+          
+          msg.style.display = 'block';
+          if (data.success) {
+            msg.style.background = '#d1fae5';
+            msg.style.color = '#065f46';
+            msg.textContent = '✓ ' + data.message;
+            form.reset();
+          } else {
+            throw new Error(data.message);
+          }
+          
+        } catch (error) {
+          msg.style.display = 'block';
+          msg.style.background = '#fee2e2';
+          msg.style.color = '#991b1b';
+          msg.textContent = '✗ ' + (error.message || 'Fehler. Bitte erneut versuchen.');
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Zur Warteliste';
+        }
+      });
+    })();
+    </script>
 
     <!-- FAQ -->
     <section aria-labelledby="faq-title">
@@ -355,5 +449,89 @@
     </div>
   </div>
 </footer>
+  }
+
+<!-- ========== GAME MODAL ========== -->
+<div id="gameModal" class="game-modal">
+  <div class="game-modal-close" onclick="closeGameModal()">✕</div>
+  <iframe id="gameFrame" src="" frameborder="0"></iframe>
+</div>
+
+<style>
+.game-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  animation: fadeIn 0.3s ease;
+}
+.game-modal.show { display: block; }
+.game-modal-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 10000;
+  transition: background 0.2s;
+}
+.game-modal-close:hover {
+  background: rgba(239, 68, 68, 0.8);
+}
+#gameFrame {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+</style>
+
+
+<script>
+(function () {
+  const modal = document.getElementById('gameModal');
+  const frame  = document.getElementById('gameFrame');
+
+  function openGameModal(url) {
+    frame.src = url || '/tuerspiel.html';  // Mit führendem Slash!
+    modal.classList.add('show');
+    document.documentElement.style.overflow = 'hidden';
+  }
+
+  function closeGameModal() {
+    modal.classList.remove('show');
+    frame.src = 'about:blank';
+    document.documentElement.style.overflow = '';
+  }
+
+  // Hash-Support für Direktlink
+  if (window.location.hash === '#spiel') {
+    openGameModal();
+  }
+
+  // ESC-Taste zum Schließen
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeGameModal();
+  });
+
+  // Global verfügbar machen
+  window.openGameModal = openGameModal;
+  window.closeGameModal = closeGameModal;
+})();
+</script>
+
 </body>
 </html>
