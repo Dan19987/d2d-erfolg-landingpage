@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>D2D-Erfolg – Türspiel Advanced</title>
+  <style>
+    :root{
+      --bg:#0f172a;
+      --card:#111827;
+      --muted:#94a3b8;
+      --text:#e5e7eb;
+      --accent:#06b6d4;
+      --accent-strong:#0891b2;
+      --danger:#ef4444;
+      --success:#22c55e;
+      --warning:#f59e0b;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background: radial-gradient(1200px 800px at 80% -10%, #1f2937 0%, var(--bg) 60%);
+      color:var(--text);
+      display:flex; 
+      justify-content:flex-start; 
+      align-items:flex-start;
+      padding-block: 12px;
+    }
+    
+    @media (min-width:860px){
+      body{
+        align-items:center;
+      }
+    }
+
+    .app{
+      width:min(950px, 100%);
+      padding: clamp(16px, 2vw, 28px);
+      min-height:100dvh;
+      display:flex; flex-direction:column;
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:20px;
+      padding:clamp(16px, 2.5vw, 28px);
+      box-shadow: 0 10px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.04);
+      display:flex; flex-direction:column;
+      flex:1; min-height:0;
+    }
+
+    .header{ display:flex; gap:16px; align-items:center; justify-content:space-between; margin-bottom:18px; }
+    .brand{ display:flex; align-items:center; gap:12px; }
+    .brand .logo{ width:42px; height:42px; border-radius:12px; background: conic-gradient(from 0deg, var(--accent), #38bdf8, #67e8f9, var(--accent)); box-shadow:0 0 18px rgba(6,182,212,.35) inset; }
+    .brand h1{ font-size: clamp(18px, 2.2vw, 24px); margin:0; letter-spacing:.2px; line-height:1.2; }
+    .subtitle{ color:var(--muted); font-size:14px; margin-top:4px; }
+
+    .stage{
+      flex:1; min-height:0;
+      display:grid; gap:18px;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width:860px){
+      .stage{ grid-template-columns: 1.15fr .85fr; }
+    }
+
+    .scene{
+      position:relative;
+      border-radius:18px; overflow:hidden;
+      background:
+        radial-gradient(1200px 500px at -10% 110%, #0b1222 0%, #0b1222 60%, transparent 70%),
+        linear-gradient(180deg, #0b1222, #0b1222);
+      border:1px solid rgba(255,255,255,.06);
+      min-height:360px;
+      height:auto;
+    }
+    .floor{ position:absolute; left:0; right:0; bottom:0; height:28%; background:linear-gradient(180deg,#0c1426 0%, #0a1222 40%, #070e1d 100%); box-shadow:0 -20px 50px rgba(0,0,0,.5) inset; }
+
+    .door-wrap{
+      position:absolute; inset:clamp(14px, 2vw, 22px);
+      display:flex; align-items:stretch; justify-content:center; gap:18px;
+    }
+
+    .trust-indicator{
+      width:32px; height:100%;
+      display:flex; flex-direction:column; align-items:center; gap:8px;
+      padding:10px 6px;
+      background: rgba(2,6,23,.55);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 12px;
+      backdrop-filter: blur(4px);
+    }
+    .trust-label{
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      transform: rotate(180deg);
+      font-size:10px; color:var(--muted); font-weight:700; letter-spacing:.6px;
+    }
+    .trust-meter{
+      position:relative; width:12px; flex:1;
+      background: rgba(255,255,255,.10);
+      border-radius: 999px; overflow:hidden;
+    }
+    .trust-fill{
+      position:absolute; left:0; right:0; bottom:0;
+      height:0%;
+      border-radius:999px;
+      background: linear-gradient(to top, var(--danger), var(--warning), var(--success));
+      box-shadow: 0 0 10px rgba(34,197,94,.55);
+      transition: height .28s cubic-bezier(.22,.95,.18,.99);
+    }
+    .trust-fill.low  { box-shadow: 0 0 10px rgba(239,68,68,.55); }
+    .trust-fill.high { box-shadow: 0 0 10px rgba(34,197,94,.85); }
+    .trust-value{ font-size:12px; font-weight:800; line-height:1; }
+    .trust-emoji{ font-size:18px; }
+
+    @keyframes trustShake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-4px); }
+      50% { transform: translateX(4px); }
+      75% { transform: translateX(-2px); }
+    }
+    .trust-indicator.shake { animation: trustShake 0.3s ease-in-out; }
+
+    .door{
+      height:100%;
+      aspect-ratio:1 / 2;
+      width:auto; max-height:none;
+      max-width: calc(100% - 122px);
+      background: linear-gradient(180deg, #1f2937 0%, #0f172a 100%);
+      border: 2px solid rgba(255,255,255,.12);
+      border-radius: 12px;
+      position:relative;
+      box-shadow: 0 30px 60px rgba(0,0,0,.6), inset 0 0 0 2px rgba(255,255,255,.06);
+      transform-origin: left center;
+      transition: transform 420ms cubic-bezier(.22,.95,.18,.99), filter .2s;
+    }
+    .door.open{ transform: perspective(1200px) rotateY(-22deg) translateX(-2px); filter: brightness(1.08); }
+    .door.closed{ transform: perspective(1200px) rotateY(0deg); }
+    .panel{ position:absolute; left:14px; right:14px; top:14px; bottom:14px; border-radius:8px; border:1px solid rgba(255,255,255,.08);
+      background: repeating-linear-gradient( to bottom, rgba(255,255,255,.03) 0 8px, rgba(255,255,255,.02) 8px 16px );
+      box-shadow: inset 0 0 0 2px rgba(0,0,0,.35);
+    }
+    .knob{ position:absolute; right:18px; top:50%; width:14px; height:14px; background: radial-gradient(circle at 30% 30%, #ffe8a3, #c0841a); border-radius:50%; box-shadow:0 1px 0 rgba(255,255,255,.35) inset, 0 0 0 2px rgba(0,0,0,.35); }
+
+    .sign{
+      position:absolute; top:32px; left:50%; transform:translateX(-50%) rotate(-2.5deg);
+      background: #0b1222; color: var(--text);
+      border: 1px dashed rgba(255,255,255,.25);
+      border-radius:10px; padding:8px 12px; font-weight:600; font-size:13px; letter-spacing:.3px;
+      box-shadow: 0 8px 18px rgba(0,0,0,.35);
+    }
+    .sign::after{ content:"✋"; margin-left:8px; opacity:.9 }
+
+    .doorbell{
+      position:relative; width:54px; height:120px; display:flex; align-items:center; justify-content:center;
+      border-radius:16px; border:1px solid rgba(255,255,255,.12);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      box-shadow: 0 10px 26px rgba(0,0,0,.35);
+      cursor:pointer; user-select:none;
+    }
+    .doorbell:active{ transform: translateY(1px); }
+    .ding{
+      width:30px; height:30px; border-radius:50%;
+      background: radial-gradient(circle at 30% 30%, #ffffff, #cbd5e1);
+      box-shadow: inset 0 0 0 2px rgba(0,0,0,.28), 0 0 0 4px rgba(6,182,212,.25);
+      display:flex; align-items:center; justify-content:center; font-weight:900; color:#0b1222;
+    }
+    .doorbell .hint{ position:absolute; bottom:8px; font-size:10px; color:var(--muted); }
+
+    .ui{ position:absolute; inset:12px; pointer-events:none; }
+    .btn{ appearance:none; border:none; border-radius:12px; padding:12px 16px; font-weight:700; letter-spacing:.2px; color:#0b1222; background:linear-gradient(180deg, #67e8f9, var(--accent)); cursor:pointer; box-shadow:0 8px 16px rgba(6,182,212,.35); transition: transform .06s ease, box-shadow .2s; }
+    .btn-ghost{ background:transparent; color:var(--text); border:1px solid rgba(255,255,255,.18); box-shadow:none; }
+
+    .start-overlay{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:14px; background: linear-gradient(180deg, rgba(2,6,23,.65), rgba(2,6,23,.55)); backdrop-filter: blur(2px); pointer-events:auto; text-align:center; padding:16px; }
+    .start-overlay h2{ margin:0; font-size: clamp(18px, 2.1vw, 22px); }
+    .start-overlay p{ margin:0; color:var(--muted); }
+
+    .difficulty-select{ display:grid; gap:12px; width:100%; max-width:400px; }
+    .difficulty-btn {
+      width:100%;
+      text-align:left;
+      padding:16px 20px;
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border:2px solid rgba(255,255,255,.12);
+      border-radius:16px;
+      cursor:pointer;
+      transition: all .2s;
+      color:var(--text);
+    }
+    .difficulty-btn:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(6,182,212,.25);
+    }
+    .difficulty-btn strong {
+      display:block;
+      font-size:18px;
+      margin-bottom:6px;
+    }
+    .difficulty-btn small {
+      display:block;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.4;
+    }
+
+    .bubble{ position:absolute; background:#0b1222; color:var(--text); border:1px solid rgba(255,255,255,.14); padding:8px 12px; border-radius:14px; font-weight:700; box-shadow: 0 8px 18px rgba(0,0,0,.35); animation: pop .18s ease-out; pointer-events:none; }
+    .bubble::after{ content:""; position:absolute; width:10px; height:10px; background:#0b1222; border-left:1px solid rgba(255,255,255,.14); border-bottom:1px solid rgba(255,255,255,.14); transform: rotate(45deg); bottom:-5px; left:12px; }
+    @keyframes pop{ from{ transform: scale(.85); opacity:0 } to{ transform: scale(1); opacity:1 } }
+
+    .stack{
+      display:flex; flex-direction:column; gap:16px;
+      min-height:0; overflow:auto;
+    }
+    @media (max-width: 859px){
+      .stack{ overflow: visible; }
+    }
+
+    .dialog{ background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); border:1px solid rgba(255,255,255,.10); border-radius:16px; padding:14px; display:flex; flex-direction:column; gap:10px; }
+    .dialog h3{ margin:0 0 2px 0; font-size:16px; letter-spacing:.2px; }
+    .options{ display:grid; gap:10px; }
+    .option{ width:100%; text-align:left; padding:12px 14px; background:#0b1222; color:var(--text); border:1px solid rgba(255,255,255,.12); border-radius:12px; cursor:pointer; transition: transform .05s ease, border-color .2s; }
+    .option:hover{ transform: translateY(-1px); border-color: rgba(6,182,212,.45); }
+
+    .result{ display:none; gap:10px; align-items:center; }
+    .result.show{ display:flex; }
+    .badge{ font-weight:800; font-size:12px; padding:6px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.16); }
+    .badge.success{ background: rgba(34,197,94,.12); color:#86efac; border-color: rgba(34,197,94,.35); }
+    .badge.fail{ background: rgba(239,68,68,.12); color:#fecaca; border-color: rgba(239,68,68,.35); }
+    .badge.warn{ background: rgba(245,158,11,.12); color:#fde68a; border-color: rgba(245,158,11,.35); }
+
+    .stats-grid {
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:12px;
+      margin:16px 0;
+    }
+    @media (max-width:640px){
+      .stats-grid { grid-template-columns: 1fr; }
+    }
+    .stat-box {
+      background: rgba(6,182,212,.08);
+      border:1px solid rgba(6,182,212,.25);
+      border-radius:12px;
+      padding:14px;
+      text-align:center;
+    }
+    .stat-value {
+      font-size:32px;
+      font-weight:800;
+      color:var(--accent);
+      line-height:1;
+      margin-bottom:6px;
+    }
+    .stat-label {
+      font-size:12px;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.5px;
+    }
+    .result-summary {
+      background: linear-gradient(145deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+      border-radius:12px;
+      padding:16px;
+      text-align:center;
+      margin:16px 0;
+    }
+    .stat-actions {
+      display:flex;
+      gap:10px;
+      margin-top:14px;
+      flex-wrap:wrap;
+    }
+    #allTimeStats {
+      margin-top:20px;
+      padding-top:16px;
+      border-top:1px solid rgba(255,255,255,.1);
+    }
+    #allTimeStats h4 {
+      margin:0 0 12px;
+      font-size:14px;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.5px;
+    }
+    #allTimeStats > div {
+      display:flex;
+      justify-content:space-between;
+      padding:8px 0;
+      border-bottom:1px solid rgba(255,255,255,.05);
+    }
+
+    .footer{ margin-top:18px; color:var(--muted); font-size:12px; text-align:center; }
+
+    .siren{
+      width:28px; height:18px;
+      border-radius:6px 6px 2px 2px;
+      background:linear-gradient(90deg, #ef4444 0 50%, #3b82f6 50% 100%);
+      box-shadow:0 0 12px rgba(239,68,68,.45), 0 0 12px rgba(59,130,246,.45);
+      opacity:0; transform: translateY(-6px);
+      transition: opacity .25s, transform .25s;
+    }
+    .siren.show{ opacity:1; transform: translateY(0); }
+
+    .bell-stack{
+      display:flex; flex-direction:column; align-items:center; gap:8px;
+    }
+    .scene .siren{
+      position: static;
+      width: 54px; height: 18px; border-radius: 8px;
+    }
+
+    .waitwrap{
+      position:absolute;
+      left:50%;
+      bottom:12px;
+      transform:translateX(-50%);
+      width:min(520px, 86%);
+      pointer-events:auto;
+      display:none;
+    }
+    .waitwrap.show{ display:block; }
+
+    .waitbar{
+      height:12px;
+      border-radius:999px;
+      border:2px solid rgba(255,255,255,.4);
+      background: rgba(255,255,255,.2);
+      overflow:hidden;
+      box-shadow:
+        0 2px 10px rgba(0,0,0,.25) inset,
+        0 6px 14px rgba(0,0,0,.25);
+    }
+
+    .waitfill{
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, #67e8f9 0%, var(--accent) 100%);
+      box-shadow:
+        0 0 14px rgba(6,182,212,.35) inset,
+        0 0 12px rgba(6,182,212,.25);
+      border-radius:999px;
+      transition: width .08s linear;
+    }
+
+    .waitlabel{
+      margin-top:6px;
+      font-size:12px;
+      color:var(--muted);
+      text-align:center;
+      text-shadow: 0 1px 0 rgba(0,0,0,.4);
+    }
+
+    .pulse{ position:absolute; bottom:14px; right:14px; width:12px; height:12px; border-radius:50%; background: var(--accent); box-shadow:0 0 0 0 rgba(6,182,212,.6); animation: pulse 1.8s infinite; }
+    @keyframes pulse{ 0%{ box-shadow:0 0 0 0 rgba(6,182,212,.6)} 70%{ box-shadow:0 0 0 18px rgba(6,182,212,0)} 100%{ box-shadow:0 0 0 0 rgba(6,182,212,0)} }
+
+    @media (max-width: 640px) {
+      .scene{ min-height: 320px; }
+      .door-wrap { gap: 10px; }
+      .trust-indicator { width: 24px; padding: 8px 4px; gap: 6px; }
+      .trust-label { font-size: 8px; letter-spacing: .4px; }
+      .trust-meter { width: 10px; }
+      .trust-value { font-size: 10px; }
+      .trust-emoji { font-size: 14px; }
+      .doorbell { width: 42px; height: 100px; }
+      .ding { width: 26px; height: 26px; font-size: 14px; }
+      .doorbell .hint { font-size: 9px; bottom: 6px; }
+      .scene .siren { width: 42px; height: 16px; }
+      .door { max-width: calc(100% - 90px); }
+      .sign { font-size: 11px; padding: 6px 10px; top: 24px; }
+      .waitwrap { width: min(420px, 90%); bottom: 8px; }
+      .waitbar { height: 10px; }
+      .waitlabel { font-size: 11px; }
+    }
+
+    @media (max-width: 420px) {
+      .brand { flex-direction: column; align-items: flex-start; }
+      .brand .logo { width: 36px; height: 36px; }
+      .subtitle { font-size: 12px; }
+      .door-wrap { gap: 8px; inset: 10px; }
+      .trust-indicator { width: 20px; padding: 6px 3px; }
+      .trust-label { font-size: 7px; }
+      .trust-emoji { font-size: 12px; }
+      .doorbell { width: 36px; height: 90px; }
+      .ding { width: 22px; height: 22px; font-size: 12px; }
+      .scene .siren { width: 36px; height: 14px; }
+      .sign { font-size: 10px; padding: 5px 8px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app">
+    <div class="card">
+      <div class="header">
+        <div class="brand">
+          <div class="logo" aria-hidden="true"></div>
+          <div>
+            <h1>D2D-Erfolg – Interaktives Türspiel</h1>
+            <div class="subtitle">Advanced Edition mit Schwierigkeitsgraden & Performance-Tracking</div>
+          </div>
+        </div>
+        <button class="btn btn-ghost" id="resetBtn" title="Neu starten" aria-label="Neu starten" style="display:none">Neu starten</button>
+      </div>
+
+      <div class="stage">
+        <div class="scene">
+          <div class="floor"></div>
+
+          <div class="door-wrap">
+            <div class="trust-indicator" id="trustBox" aria-hidden="false">
+              <div class="trust-label">TRUST</div>
+              <div class="trust-meter">
+                <div class="trust-fill" id="trustFill" style="height:0%"></div>
+              </div>
+              <div class="trust-value"><span id="trustVal">0</span></div>
+              <div class="trust-emoji" id="trustEmoji">🙂</div>
+            </div>
+
+            <div id="door" class="door closed" role="button" aria-label="Tür – tippen zum Klopfen">
+              <div class="panel"></div>
+              <div class="sign">Vertreterbesuch unerwünscht</div>
+              <div class="knob"></div>
+              <div class="pulse" aria-hidden="true"></div>
+            </div>
+
+            <div class="bell-stack">
+              <div id="doorbell" class="doorbell" role="button" aria-label="Klingelknopf – tippen zum Klingeln">
+                <div class="ding">🔔</div>
+                <div class="hint">Klingeln</div>
+              </div>
+              <div class="siren" id="siren" aria-hidden="true"></div>
+            </div>
+          </div>
+
+          <div class="ui">
+            <div class="start-overlay" id="startOverlay">
+              <h2>Wähle deinen Schwierigkeitsgrad</h2>
+              <p style="margin-bottom:20px">Danach 2× klopfen/klingeln zum Start</p>
+              <div class="difficulty-select">
+                <button class="difficulty-btn" data-difficulty="EASY">
+                  <strong>🟢 Anfänger</strong>
+                  <small>Kunde ist grundsätzlich offen. Perfekt zum Üben der Basics.</small>
+                </button>
+                <button class="difficulty-btn" data-difficulty="NORMAL">
+                  <strong>🟡 Fortgeschritten</strong>
+                  <small>Realistische Einwände, skeptischer Kunde. Echte Praxis.</small>
+                </button>
+                <button class="difficulty-btn" data-difficulty="HARD">
+                  <strong>🔴 Profi</strong>
+                  <small>Aggressive Abwehr, Zeitdruck, Nachbarn. Nur für Experten.</small>
+                </button>
+              </div>
+            </div>
+
+            <div class="waitwrap" id="waitWrap" aria-live="polite">
+              <div class="waitbar"><div class="waitfill" id="waitFill"></div></div>
+              <div class="waitlabel" id="waitLabel">Kommt gleich … 3s</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="dialog" id="dialog" aria-live="polite" aria-atomic="true">
+            <h3 id="customerLine">Wähle Schwierigkeitsgrad, dann 2× klopfen …</h3>
+            <div class="options" id="options"></div>
+            <div class="result" id="result">
+              <span class="badge" id="resultBadge">Status</span>
+              <div id="resultText">Ergebnis erscheint hier.</div>
+            </div>
+          </div>
+
+          <div class="card" id="statsCard" style="display:none">
+            <h3>Deine Performance</h3>
+            <div class="stats-grid">
+              <div class="stat-box">
+                <div class="stat-value" id="statTrust">0</div>
+                <div class="stat-label">Finales Vertrauen</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-value" id="statChoices">0</div>
+                <div class="stat-label">Entscheidungen</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-value" id="statTime">0s</div>
+                <div class="stat-label">Gesprächszeit</div>
+              </div>
+            </div>
+            <div class="result-summary">
+              <div class="badge" id="statBadge">Auswertung...</div>
+              <p id="statFeedback" style="margin:10px 0 0"></p>
+            </div>
+            <div class="stat-actions">
+              <button class="btn" id="saveStats">Score speichern</button>
+              <button class="btn btn-ghost" id="shareStats">Teilen</button>
+            </div>
+            <div id="allTimeStats">
+              <h4>Deine Bestleistungen</h4>
+              <div><span>Höchstes Vertrauen:</span> <strong id="bestTrust">-</strong></div>
+              <div><span>Schnellster Abschluss:</span> <strong id="bestTime">-</strong></div>
+              <div><span>Gespielte Runden:</span> <strong id="totalGames">0</strong></div>
+            </div>
+          </div>
+
+          <div class="card" id="ctaCard" style="display:none">
+            <h3 style="margin-top:0">Willst du sehen, wie es <em>richtig</em> geht?</h3>
+            <p style="color:var(--muted); margin:6px 0 14px">Praxisnahe Leitfäden, Live-Beispiele, Templates.</p>
+            <div style="display:flex; gap:10px; flex-wrap:wrap">
+              <a class="btn" href="#kurs" id="ctaPrimary">Jetzt Kurs ansehen</a>
+              <button class="btn btn-ghost" id="playAgain">Nochmal spielen</button>
+            </div>
+          </div>
+
+          <div class="footer">
+            Advanced Edition • Schwierigkeitsgrade • Performance-Tracking • Extended Dialog
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<audio id="sfx-knock"       src="/assets/audio/knock.mp3"       preload="auto"></audio>
+<audio id="sfx-bell"        src="/assets/audio/dingdong2.mp3"   preload="auto"></audio>
+<audio id="sfx-dooropen"    src="/assets/audio/dooropen.mp3"    preload="auto"></audio>
+<audio id="sfx-doorclosed"  src="/assets/audio/doorclosed.mp3"  preload="auto"></audio>
+<audio id="sfx-police"      src="/assets/audio/police.mp3"      preload="auto"></audio>
+<audio id="sfx-success"     src="/assets/audio/success.mp3"     preload="auto"></audio>
+
+  <script>
+    const CONFIG = {
+      courseUrl: '/kurs',
+      genericWaitMs: 2000,
+      momentWaitMs: 3000,
+      knockDecayMs: 8000
+    };
+
+    const DIFFICULTY = {
+      EASY: {
+        label: "Anfänger",
+        desc: "Kunde ist grundsätzlich offen. Perfekt zum Üben.",
+        trustStart: 0,
+        maxKnocks: 3,
+        allowSecondChance: true
+      },
+      NORMAL: {
+        label: "Fortgeschritten", 
+        desc: "Realistische Einwände, skeptischer Kunde.",
+        trustStart: -1,
+        maxKnocks: 2,
+        allowSecondChance: false
+      },
+      HARD: {
+        label: "Profi",
+        desc: "Aggressive Abwehr, Zeitdruck, Nachbarn. Nur für Experten.",
+        trustStart: -2,
+        maxKnocks: 2,
+        allowSecondChance: false,
+        escalationChance: 0.3
+      }
+    };
+
+    const DIALOG = {
+      start: "START",
+      states: { trust: 0, timePressure: 0, door: "closed" },
+      nodes: [
+        {
+          id: "START",
+          speaker: "customer",
+          text: "Hallo? Wer ist da?",
+          door: "closed",
+          options: [
+            { text: "Guten Tag, ich bin Daniel aus der Nachbarschaft. Kurzer Energie-Check – 60 Sekunden.", to: "WHY_ME", on: { "trust+": 1, "door": "ajar" } },
+            { text: "Einmal aufmachen, dauert nur ganz kurz.", ending: "warn", note: "Übergriffig, schlechter Start", on: { "trust-": 1 } },
+            { text: "(Visitenkarte zeigen) Ich helfe heute Haus für Haus beim Senken der Nebenkosten.", to: "WHY_ME", on: { "trust+": 1, "door": "ajar" } }
+          ]
+        },
+        {
+          id: "AGGRESSIVE_START",
+          speaker: "customer",
+          text: "HIER STEHT KEINE VERTRETER! Können Sie nicht lesen?!",
+          door: "closed",
+          meta: { hardMode: true },
+          options: [
+            { text: "Entschuldigung, das habe ich übersehen. Ich gehe sofort.", ending: "neutral", note: "Respektvoller Rückzug", on: { "trust+": 1 } },
+            { text: "Ich bin kein Vertreter, sondern Energieberater.", ending: "fail", note: "Haarspalterei verärgert nur mehr" },
+            { text: "Das Schild gilt nicht für mich, ich bin vom Anbieter.", ending: "fail", note: "Lüge wird sofort durchschaut" }
+          ]
+        },
+        {
+          id: "WHY_ME",
+          speaker: "customer",
+          text: "Warum ausgerechnet bei mir?",
+          door: "ajar",
+          options: [
+            { text: "Viele Verträge 2022/23 sind zu hoch. Ich prüfe fair & unverbindlich.", to: "ROLE_CHECK", on: { "trust+": 1 } },
+            { text: "Chef sagt, ich muss.", ending: "fail", note: "Unsympathisch" },
+            { text: "Wenn es nicht passt, bin ich in 20 Sekunden wieder weg. Versprochen.", to: "ROLE_CHECK", on: { "timePressure-": 1 } }
+          ]
+        },
+        {
+          id: "ID_REQUEST",
+          speaker: "customer",
+          text: "Zeigen Sie mir erst mal Ihren Ausweis. Wir hatten hier schon Betrüger.",
+          door: "closed",
+          options: [
+            { text: "(Ausweis zeigen) Selbstverständlich. Hier, bitte sehr.", to: "WHY_ME", on: { "trust+": 2, "door": "ajar" } },
+            { text: "Das ist nicht nötig, vertrauen Sie mir einfach.", ending: "fail", note: "Verweigerung wirkt verdächtig" },
+            { text: "Ich habe keine Zeit für sowas. Machen Sie mit oder nicht?", ending: "warn", note: "Arroganz verschärft Misstrauen" }
+          ]
+        },
+        {
+          id: "ROLE_CHECK",
+          speaker: "customer",
+          text: "Sind Sie von meinem Anbieter?",
+          options: [
+            { text: "Nein. Ich vergleiche und erkläre, wann sich Wechsel oder Anpassungen lohnen.", to: "TENANT_OWNER" },
+            { text: "Mehr so… irgendwas dazwischen.", ending: "warn", note: "Unklarheit killt Vertrauen", on: { "trust-": 1 } }
+          ]
+        },
+        {
+          id: "TENANT_OWNER",
+          speaker: "customer",
+          text: "Ich bin Mieter. Bringt das überhaupt was?",
+          options: [
+            { text: "Ja. Arbeitspreis/Grundpreis sind privat relevant. Ein Blick auf die Abrechnung reicht.", to: "DOCS", on: { "trust+": 1 } },
+            { text: "Eigentümer-Thema. Dann nicht.", ending: "fail", note: "Falsche Einordnung" },
+            { text: "Als Eigentümer wäre PV spannend. Als Mieter checken wir den Stromtarif. 60 Sek.?", to: "DOCS" }
+          ]
+        },
+        {
+          id: "EXISTING_CUSTOMER",
+          speaker: "customer",
+          text: "Ich bin doch schon Kunde bei Ihnen seit 2 Jahren. Warum klingeln Sie dann?",
+          door: "ajar",
+          options: [
+            { text: "Perfekt! Dann schaue ich, ob Ihr Tarif noch aktuell ist. Haben Sie auch Gas?", to: "CROSS_SELL_GAS", on: { "trust+": 1 } },
+            { text: "Dann ist ja alles gut. Entschuldigung für die Störung.", ending: "neutral", note: "Verpasste Cross-Sell-Chance" },
+            { text: "Trotzdem sollten wir mal über Gas sprechen. Sie zahlen bestimmt zu viel.", to: "CROSS_SELL_GAS", on: { "trust+": 1 } }
+          ]
+        },
+        {
+          id: "CROSS_SELL_GAS",
+          speaker: "customer",
+          text: "Gas habe ich bei einem anderen Anbieter. Das läuft aber gut.",
+          options: [
+            { text: "Verstehe. Mit Kombi-Tarif könnten Sie nochmal 10-15% sparen. Rechnung zur Hand?", to: "READOUT", on: { "trust+": 1 } },
+            { text: "Dann lassen wir das. Danke für Ihre Zeit.", ending: "neutral", note: "Vorsichtig, aber Chance verpasst" }
+          ]
+        },
+        {
+          id: "DOCS",
+          speaker: "customer",
+          text: "Ich habe die Unterlagen gerade nicht hier.",
+          options: [
+            { text: "Kein Stress. Oben rechts stehen Anbieter, Grund- und Arbeitspreis. Reicht mir.", to: "DOCS_SEARCH", on: { "trust+": 1 } },
+            { text: "Dann holen Sie sie eben schnell.", ending: "fail", note: "Druck erzeugt Gegendruck", on: { "trust-": 2 } },
+            { text: "Ich blocke 18:00 für einen 5-Minuten-Check, passt das?", ending: "success", note: "Termin vereinbart" }
+          ]
+        },
+        {
+          id: "DOCS_SEARCH",
+          speaker: "narrator",
+          text: "Der Kunde kramt. Es dauert einen Moment.",
+          delayMs: 1200,
+          options: [
+            { text: "(Warten, freundlich lächeln, nicht klingeln/klopfen)", to: "READOUT", on: { "trust+": 1 } },
+            { text: "(Ungeduldig klingeln)", ending: "warn", note: "Eskalation durch Ungeduld" }
+          ]
+        },
+        {
+          id: "READOUT",
+          speaker: "customer",
+          text: "Hier: Grundpreis 13,90 €, Arbeitspreis 39,5 ct/kWh.",
+          options: [
+            { text: "Danke. Bei ~3.200 kWh sparen Sie ~360 €/Jahr. Ich zeige kurz die Alternative.", to: "PRICE_OBJECTION", on: { "trust+": 1 } },
+            { text: "Ihr Anbieter ist Abzocke! Sofort kündigen!", ending: "warn", note: "Panikmache schadet", on: { "trust-": 1 } }
+          ]
+        },
+        {
+          id: "PRICE_OBJECTION",
+          speaker: "customer",
+          text: "Das klingt teuer. Ich zahle aktuell 120€ im Monat.",
+          options: [
+            { text: "Verstehe. Bei 360€ Ersparnis pro Jahr würden Sie nur noch 90€/Monat zahlen. Rechnen wir durch?", to: "PRICE_BREAKDOWN", on: { "trust+": 2 } },
+            { text: "Das ist doch nicht teuer! Sie zahlen ja viel zu viel!", ending: "warn", note: "Defensiv und unsensibel" },
+            { text: "Ihr aktueller Anbieter zockt Sie ab. Die machen das mit allen so.", ending: "fail", note: "Panikmache wirkt unseriös" }
+          ]
+        },
+        {
+          id: "PRICE_BREAKDOWN",
+          speaker: "sales",
+          text: "Aktuell: 120€ × 12 = 1.440€/Jahr. Neu: 1.080€/Jahr. Ersparnis: 360€. Passt das?",
+          options: [
+            { text: "Klingt gut. Wie läuft der Wechsel ab?", to: "FAST_EXPLAIN" },
+            { text: "Aber bei Check24 habe ich 28€/Monat gesehen, das wären nur 92€.", to: "COMPETITOR_OFFER" }
+          ]
+        },
+        {
+          id: "COMPETITOR_OFFER",
+          speaker: "customer",
+          text: "Check24 hat mir 28€ weniger pro Monat angeboten. Das ist günstiger als Sie.",
+          options: [
+            { text: "Verstehe. Darf ich fragen: Preisgarantie wie lange? Oft nur 12 statt 24 Monate.", to: "COMPARE_OFFERS", on: { "trust+": 1 } },
+            { text: "Check24-Angebote sind Lockvogel-Tarife. Die taugen nichts.", ending: "warn", note: "Konkurrenz schlechtmachen wirkt unseriös" },
+            { text: "Dann nehmen Sie halt das Angebot. Viel Glück.", ending: "neutral", note: "Aufgegeben ohne Kampf" }
+          ]
+        },
+        {
+          id: "COMPARE_OFFERS",
+          speaker: "sales",
+          text: "Bei uns: 24 Monate Preisgarantie. Check24 oft nur 12, dann springt Preis hoch. Langfristig teurer.",
+          options: [
+            { text: "Ah, verstehe. Dann lieber Ihre Variante.", to: "FAST_EXPLAIN", on: { "trust+": 1 } },
+            { text: "Das glaube ich nicht. Zeigen Sie mir Beweise.", to: "PROOF_REQUEST" }
+          ]
+        },
+        {
+          id: "PROOF_REQUEST",
+          speaker: "customer",
+          text: "Ich will das schwarz auf weiß sehen. Sonst unterschreibe ich nichts.",
+          options: [
+            { text: "(Tablet/Dokument zeigen) Hier, bitte. Vertragsbedingungen im Detail.", to: "FAST_EXPLAIN", on: { "trust+": 2 } },
+            { text: "Sie müssen mir einfach vertrauen. Ich lüge nicht.", ending: "warn", note: "Verweigerung von Transparenz schadet" }
+          ]
+        },
+        {
+          id: "NEIGHBOR_WARNING",
+          speaker: "customer",
+          text: "Mein Nachbar hatte nach dem Wechsel nur Ärger. Service nicht erreichbar, Rechnungen falsch.",
+          options: [
+            { text: "Das tut mir leid für ihn. Bei uns: Direktkontakt zu mir, ich kümmere mich persönlich.", to: "FAST_EXPLAIN", on: { "trust+": 1 } },
+            { text: "Ihr Nachbar hat bestimmt selbst Fehler gemacht. Bei mir läuft alles glatt.", ending: "warn", note: "Nachbar schlechtmachen ist unsensibel" },
+            { text: "Solche Fälle kommen vor, aber das ist die Ausnahme. Kein Grund zur Sorge.", to: "FAST_EXPLAIN", on: { "timePressure-": 1 } }
+          ]
+        },
+        {
+          id: "NEIGHBOR_INTERFERENCE",
+          speaker: "narrator",
+          text: "Ein Nachbar ruft aus dem Flur: 'Die haben mich auch verarscht! Mach bloß nichts!'",
+          meta: { hardMode: true },
+          options: [
+            { text: "(Fokus auf Kunden) 'Lassen Sie uns in Ruhe besprechen. Jeder Fall ist anders.'", to: "NEIGHBOR_WARNING", on: { "trust+": 1 } },
+            { text: "(Zum Nachbarn) 'Das stimmt nicht! Sie verwechseln uns mit jemand anderem!'", ending: "warn", note: "Diskussion eskaliert" },
+            { text: "(Zum Nachbarn) 'Halten Sie sich da raus, das geht Sie nichts an!'", ending: "fail", note: "Beleidigung zerstört alles" }
+          ]
+        },
+        {
+          id: "STRESS_COMBO",
+          speaker: "customer",
+          text: "(Handy am Ohr, Kind schreit im Hintergrund) 'Ich habe gerade WIRKLICH keine Zeit!'",
+          door: "ajar",
+          meta: { hardMode: true },
+          options: [
+            { text: "Verstehe total. Darf ich morgen 18 Uhr nochmal vorbeikommen? 5 Minuten reichen.", ending: "success", note: "Empathie + Termin = Win", on: { "trust+": 2 } },
+            { text: "Das dauert nur 30 Sekunden, wirklich! Nur schnell unterschreiben.", ending: "warn", note: "Druck in Stresssituation = Katastrophe" },
+            { text: "(Warten, bis Kunde fertig telefoniert hat)", ending: "fail", note: "Zeitverschwendung, Kunde genervt" }
+          ]
+        },
+        {
+          id: "FAST_EXPLAIN",
+          speaker: "sales",
+          text: "Ablauf in 30 Sekunden: Anmeldung, Kündigungsfristen, Abschlag anpassen, Support bei Rückfragen.",
+          options: [
+            { text: "Klingt sinnvoll. Und wenn es Probleme gibt?", to: "STORNO_PREVENT" },
+            { text: "Keine Zeit heute.", to: "NO_TIME" }
+          ]
+        },
+        {
+          id: "STORNO_PREVENT",
+          speaker: "sales",
+          text: "Ich lasse Kontakt & Ablauf da. Bei Rückwerbung zuerst mich anrufen, nicht den Altanbieter.",
+          meta: { tags: ["Storno-Prävention","Schleife"] },
+          options: [
+            { text: "Okay, machen wir es kurz fertig.", to: "CLOSE_SETUP", on: { "door": "open", "trust+": 1 } },
+            { text: "Ich entscheide das nicht allein.", to: "PARTNER" }
+          ]
+        },
+        {
+          id: "PARTNER",
+          speaker: "customer",
+          text: "Ohne meinen Partner mache ich nichts.",
+          options: [
+            { text: "Völlig in Ordnung. Wir klären jetzt Eckdaten, entscheiden tun Sie zusammen. 2 Minuten.", to: "CLOSE_SETUP", on: { "trust+": 1 } },
+            { text: "Der Partner freut sich über 360 €/Jahr. Unterschreiben Sie einfach.", ending: "warn", note: "Druck, Risiko Storno" },
+            { text: "Dann lassen wir es.", ending: "neutral", note: "Abbruch ohne verbrannte Erde" }
+          ]
+        },
+        {
+          id: "NO_TIME",
+          speaker: "customer",
+          text: "Heute wirklich keine Zeit.",
+          options: [
+            { text: "Alles gut. Ich lege 18:30 an. 3 Minuten, nur Zahlen.", ending: "success", note: "Termin, respektvoll", on: { "timePressure-": 1 } },
+            { text: "Es dauert wirklich nur 30 Sekunden…", ending: "warn", note: "Bagatellisieren nervt" }
+          ]
+        },
+        {
+          id: "CLOSE_SETUP",
+          speaker: "sales",
+          text: "Ich trage Werte ein, passe Abschlag an und bestätige schriftlich. Danach jederzeit erreichbar.",
+          options: [
+            { text: "Alles klar. Los geht's.", ending: "success", note: "Abschluss" },
+            { text: "Ich will keine Werbung an der Tür.", to: "NO_SOLICITING" }
+          ]
+        },
+        {
+          id: "NO_SOLICITING",
+          speaker: "customer",
+          text: "Hier steht 'Keine Werbung/Vertreter unerwünscht'.",
+          options: [
+            { text: "Verstanden. Ich respektiere das. Karte liegt im Briefkasten.", ending: "neutral", note: "Sauberer Abgang" },
+            { text: "Das gilt nicht für mich.", ending: "fail", note: "Respektlos, rechtlich heikel" }
+          ]
+        }
+      ],
+      rules: {
+        escalation: [
+          { when: { pressedBellDuringDelay: true }, result: "warn", message: "Ungeduld triggert Eskalation." }
+        ],
+        score: { success: 2, warn: -1, fail: -2, neutral: 0 }
+      }
+    };
+
+    let gameStats = {
+      startTime: null,
+      endTime: null,
+      choicesMade: 0,
+      finalTrust: 0,
+      difficulty: 'EASY',
+      outcome: null
+    };
+
+    const door = document.getElementById('door');
+    const doorbell = document.getElementById('doorbell');
+    const startOverlay = document.getElementById('startOverlay');
+    const siren = document.getElementById('siren');
+    const customerLine = document.getElementById('customerLine');
+    const optionsEl = document.getElementById('options');
+    const resultEl = document.getElementById('result');
+    const resultBadge = document.getElementById('resultBadge');
+    const resultText = document.getElementById('resultText');
+    const ctaCard = document.getElementById('ctaCard');
+    const statsCard = document.getElementById('statsCard');
+    const ctaPrimary = document.getElementById('ctaPrimary');
+    const resetBtn = document.getElementById('resetBtn');
+    const playAgain = document.getElementById('playAgain');
+    const waitWrap = document.getElementById('waitWrap');
+    const waitFill = document.getElementById('waitFill');
+    const waitLabel = document.getElementById('waitLabel');
+
+const sfx = {
+  knock:      document.getElementById('sfx-knock'),
+  bell:       document.getElementById('sfx-bell'),
+  dooropen:   document.getElementById('sfx-dooropen'),
+  doorclosed: document.getElementById('sfx-doorclosed'),
+  police:     document.getElementById('sfx-police'),
+  success:    document.getElementById('sfx-success'),
+};
+    
+    function playSfx(name, vol = 1){
+      const el = sfx[name]; 
+      if(!el || !el.src || el.error) return;
+      try{ 
+        el.pause(); 
+        el.currentTime = 0; 
+        el.volume = vol; 
+        el.play().catch(()=>{}); 
+      } catch(e) {}
+    }
+    
+    function knockSound(){ playSfx('knock', 0.9); }
+    function bellSound(){  playSfx('bell',  0.9); }
+
+    const trustFill  = document.getElementById('trustFill');
+    const trustVal   = document.getElementById('trustVal');
+    const trustEmoji = document.getElementById('trustEmoji');
+    const trustBox   = document.getElementById('trustBox');
+
+    let started = false;
+    let difficultySelected = false;
+    let selectedDifficulty = null;
+    let knocksTotal = 0;
+    let lastKnockAt = 0;
+    let waitingMode = null;
+    let openTimerId = null;
+    let rafId = null;
+    let waitStartTs = null;
+
+    const state = { ...DIALOG.states };
+    let currentNode = null;
+
+    function srSpeak(text){ customerLine.textContent = text; }
+function openDoor(){ 
+  door.classList.add('open'); 
+  door.classList.remove('closed'); 
+  playSfx('dooropen', 0.8);
+}
+
+function closeDoor(){ 
+  door.classList.add('closed'); 
+  door.classList.remove('open'); 
+  playSfx('doorclosed', 0.7);
+}
+
+    function showBubble(text, clientX=null, clientY=null){
+      const wrapRect = door.parentElement.getBoundingClientRect();
+      const rect = door.getBoundingClientRect();
+      let x = clientX != null ? Math.min(rect.right - 20, Math.max(rect.left + 20, clientX)) : (rect.left + rect.width * 0.25);
+      let y = clientY != null ? Math.min(rect.bottom - 60, Math.max(rect.top + 20, clientY)) : (rect.top + rect.height * 0.25);
+      const b = document.createElement('div'); b.className = 'bubble'; b.textContent = text;
+      b.style.left = (x - wrapRect.left - 30) + 'px';
+      b.style.top  = (y - wrapRect.top  - 40) + 'px';
+      door.parentElement.appendChild(b); setTimeout(()=> b.remove(), 1200);
+    }
+
+    function revealCTA(){ 
+      ctaPrimary.setAttribute('href', CONFIG.courseUrl); 
+      ctaCard.style.display = 'block'; 
+      resetBtn.style.display = 'inline-flex'; 
+    }
+
+    function showResult(type, note){
+      resultEl.classList.add('show'); resultText.textContent = note || '';
+      resultBadge.className = 'badge ' + (type === 'success' ? 'success' : type === 'warn' ? 'warn' : 'fail');
+      resultBadge.textContent = type === 'success' ? 'Tür geht auf' : type === 'warn' ? 'Eskalation' : 'Tür zu';
+    }
+
+    function hideWait(){
+      waitWrap.classList.remove('show');
+      waitFill.style.width = '0%';
+      waitLabel.textContent = '';
+      if(rafId){ cancelAnimationFrame(rafId); rafId = null; }
+    }
+
+    function softResetUI(){
+      hideWait();
+      resultEl.classList.remove('show'); 
+      optionsEl.innerHTML = ''; 
+      ctaCard.style.display = 'none'; 
+      statsCard.style.display = 'none';
+      siren.classList.remove('show'); 
+      resetBtn.style.display = 'none';
+      closeDoor(); 
+      srSpeak(difficultySelected ? 'Klopfe oder klingel zwei Mal …' : 'Wähle Schwierigkeitsgrad, dann 2× klopfen …');
+    }
+
+    function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+    function trustPercent(t){
+      const p = Math.round(((clamp(t, -2, 4) - (-2)) / (4 - (-2))) * 100);
+      return clamp(p, 0, 100);
+    }
+    
+    function updateTrustDisplay({ drop = false } = {}){
+      const p = drop ? 0 : trustPercent(state.trust || 0);
+      trustFill.style.height = p + '%';
+      trustFill.classList.toggle('low',  p < 35);
+      trustFill.classList.toggle('high', p > 65);
+      trustVal.textContent = String(state.trust || 0);
+      trustEmoji.textContent = drop ? '💥' : (p > 65 ? '😎' : p < 35 ? '😬' : '🙂');
+      
+      if(drop) {
+        trustBox.classList.add('shake');
+        setTimeout(() => trustBox.classList.remove('shake'), 300);
+      }
+    }
+
+    function hardReset(){
+      started = false; 
+      difficultySelected = false;
+      selectedDifficulty = null;
+      knocksTotal = 0; 
+      lastKnockAt = 0; 
+      waitingMode = null;
+      if(openTimerId){ clearTimeout(openTimerId); openTimerId = null; }
+      Object.assign(state, DIALOG.states);
+      currentNode = null;
+      gameStats = { startTime: null, endTime: null, choicesMade: 0, finalTrust: 0, difficulty: 'EASY', outcome: null };
+      softResetUI(); 
+      startOverlay.style.display = 'flex'; 
+      document.querySelector('.pulse').style.display = 'block';
+      updateTrustDisplay();
+    }
+
+    function getNode(id){ return DIALOG.nodes.find(n => n.id === id); }
+
+    function applyDoorFromNode(node){
+      const d = node.door || state.door;
+      if(d === 'open'){ openDoor(); } else { closeDoor(); }
+      state.door = d;
+    }
+
+    function animateWait(totalMs, label='Kommt gleich …'){
+      waitWrap.classList.add('show');
+      waitStartTs = performance.now();
+      function step(ts){
+        const elapsed = ts - waitStartTs;
+        const p = Math.min(1, elapsed / totalMs);
+        waitFill.style.width = (p * 100).toFixed(1) + '%';
+        const remain = Math.max(0, Math.ceil((totalMs - elapsed)/1000));
+        waitLabel.textContent = remain > 0 ? `${label} ${remain}s` : 'Öffnet…';
+        if(p < 1 && waitingMode){ rafId = requestAnimationFrame(step); } else { hideWait(); }
+      }
+      rafId = requestAnimationFrame(step);
+    }
+
+    function statePasses(requireObj = {}){
+      if(requireObj.door){
+        const allowed = Array.isArray(requireObj.door) ? requireObj.door : [requireObj.door];
+        if(!allowed.includes(state.door)) return false;
+      }
+      for(const k of Object.keys(requireObj)){
+        if(k.endsWith(">=")){
+          const key = k.replace(">=","");
+          if((state[key] ?? 0) < requireObj[k]) return false;
+        }
+      }
+      return true;
+    }
+
+    function applyOn(on = {}){
+      for(const [k,v] of Object.entries(on)){
+        if(k.endsWith("+")){ const key = k.replace("+",""); state[key] = (state[key]||0) + v; }
+        else if(k.endsWith("-")){ const key = k.replace("-",""); state[key] = (state[key]||0) - v; }
+        else if(k === "door"){ state.door = v; if(v === "open") openDoor(); else closeDoor(); }
+        else { state[k] = v; }
+      }
+      updateTrustDisplay();
+    }
+
+    function showNode(id){
+      if(!id) return;
+      currentNode = getNode(id);
+      if(!currentNode) return;
+
+      applyDoorFromNode(currentNode);
+
+      optionsEl.innerHTML = '';
+      resultEl.classList.remove('show');
+      srSpeak((currentNode.speaker === 'narrator' ? '' : 'Kunde: ') + currentNode.text);
+
+      if(currentNode.delayMs){
+        waitingMode = 'delay';
+        animateWait(currentNode.delayMs, 'Kommt gleich …');
+        if(openTimerId){ clearTimeout(openTimerId); }
+        openTimerId = setTimeout(()=>{
+          waitingMode = null; openTimerId = null; hideWait();
+          renderOptions(currentNode);
+        }, currentNode.delayMs);
+      }else{
+        renderOptions(currentNode);
+      }
+    }
+
+    function renderOptions(node){
+      optionsEl.innerHTML = '';
+      (node.options || []).forEach((opt, idx)=>{
+        if(opt.requires && !statePasses(opt.requires)) return;
+        const btn = document.createElement('button');
+        btn.className = 'option';
+        btn.innerHTML = `<strong>${idx+1}. </strong>${opt.text}`;
+        btn.addEventListener('click', ()=> handleOption(opt));
+        optionsEl.appendChild(btn);
+      });
+    }
+
+    function handleOption(opt){
+      gameStats.choicesMade++;
+      
+      if(opt.on) applyOn(opt.on);
+
+      if(opt.ending){
+        gameStats.endTime = Date.now();
+        gameStats.finalTrust = state.trust;
+        gameStats.outcome = opt.ending;
+
+        if(opt.ending === 'success'){
+          openDoor();
+          showResult('success', opt.note);
+          playSfx('success', 0.9);
+          updateTrustDisplay();
+        } else if(opt.ending === 'warn'){
+          siren.classList.add('show');
+          playSfx('police', 0.9);
+          setTimeout(()=> siren.classList.remove('show'), 1500);
+          showResult('warn', opt.note || 'Vorsicht.');
+          updateTrustDisplay({ drop:true });
+        } else if(opt.ending === 'fail'){
+          closeDoor();
+          showResult('fail', opt.note || 'Gespräch beendet.');
+          updateTrustDisplay({ drop:true });
+        } else {
+          resultEl.classList.add('show');
+          resultBadge.className = 'badge';
+          resultBadge.textContent = 'Info';
+          resultText.textContent = opt.note || '';
+          updateTrustDisplay();
+        }
+        Array.from(optionsEl.querySelectorAll('button')).forEach(b=> b.disabled = true);
+        showStats();
+        revealCTA();
+        return;
+      }
+
+      if(opt.to){
+        showNode(opt.to);
+      }
+    }
+
+    function showStats(){
+      const duration = Math.round((gameStats.endTime - gameStats.startTime) / 1000);
+      const trust = gameStats.finalTrust;
+      const outcome = gameStats.outcome;
+
+      document.getElementById('statTrust').textContent = trust;
+      document.getElementById('statChoices').textContent = gameStats.choicesMade;
+      document.getElementById('statTime').textContent = duration + 's';
+
+      const statBadge = document.getElementById('statBadge');
+      const statFeedback = document.getElementById('statFeedback');
+
+      if(outcome === 'success' && trust >= 3){
+        statBadge.className = 'badge success';
+        statBadge.textContent = '🏆 Meisterverkäufer';
+        statFeedback.textContent = 'Perfekt! Du hast nicht nur abgeschlossen, sondern auch maximales Vertrauen aufgebaut.';
+      } else if(outcome === 'success'){
+        statBadge.className = 'badge success';
+        statBadge.textContent = '✅ Abschluss geschafft';
+        statFeedback.textContent = 'Gut gemacht! Der Vertrag ist unter Dach und Fach.';
+      } else if(outcome === 'warn'){
+        statBadge.className = 'badge warn';
+        statBadge.textContent = '⚠️ Eskaliert';
+        statFeedback.textContent = 'Das Gespräch ist eskaliert. Analysiere, wo es schiefging.';
+      } else if(outcome === 'fail'){
+        statBadge.className = 'badge fail';
+        statBadge.textContent = '❌ Tür zu';
+        statFeedback.textContent = 'Der Kunde hat abgebrochen. Lerne aus den Fehlern.';
+      } else {
+        statBadge.className = 'badge';
+        statBadge.textContent = 'ℹ️ Neutral';
+        statFeedback.textContent = 'Gespräch beendet ohne klares Ergebnis.';
+      }
+
+      loadBestScores(trust, duration);
+      statsCard.style.display = 'block';
+    }
+
+    function loadBestScores(currentTrust, currentTime){
+      let stats = JSON.parse(localStorage.getItem('d2d-stats') || '{"bestTrust":-999,"bestTime":999999,"totalGames":0}');
+      
+      if(currentTrust > stats.bestTrust) stats.bestTrust = currentTrust;
+      if(gameStats.outcome === 'success' && currentTime < stats.bestTime) stats.bestTime = currentTime;
+      stats.totalGames++;
+
+      localStorage.setItem('d2d-stats', JSON.stringify(stats));
+
+      document.getElementById('bestTrust').textContent = stats.bestTrust === -999 ? '-' : stats.bestTrust;
+      document.getElementById('bestTime').textContent = stats.bestTime === 999999 ? '-' : stats.bestTime + 's';
+      document.getElementById('totalGames').textContent = stats.totalGames;
+    }
+
+    document.getElementById('saveStats').addEventListener('click', ()=>{
+      let history = JSON.parse(localStorage.getItem('d2d-history') || '[]');
+      history.push({
+        date: new Date().toISOString(),
+        trust: gameStats.finalTrust,
+        time: Math.round((gameStats.endTime - gameStats.startTime) / 1000),
+        outcome: gameStats.outcome,
+        difficulty: gameStats.difficulty
+      });
+      localStorage.setItem('d2d-history', JSON.stringify(history));
+      alert('Score gespeichert! (Später API-ready)');
+    });
+
+    document.getElementById('shareStats').addEventListener('click', async ()=>{
+      const duration = Math.round((gameStats.endTime - gameStats.startTime) / 1000);
+      const text = `🎯 D2D-Türspiel Ergebnis\n\n` +
+                   `Trust: ${gameStats.finalTrust}\n` +
+                   `Zeit: ${duration}s\n` +
+                   `Ergebnis: ${gameStats.outcome}\n` +
+                   `Schwierigkeit: ${DIFFICULTY[gameStats.difficulty].label}\n\n` +
+                   `Probier es selbst: d2d-erfolg.de`;
+      
+      if(navigator.share){
+        try {
+          await navigator.share({ text });
+        } catch(e) {
+          navigator.clipboard.writeText(text);
+          alert('In Zwischenablage kopiert!');
+        }
+      } else {
+        navigator.clipboard.writeText(text);
+        alert('In Zwischenablage kopiert!');
+      }
+    });
+
+    function startGame(){ 
+      if(!difficultySelected) return;
+      started = true; 
+      startOverlay.style.display = 'none'; 
+      document.querySelector('.pulse').style.display = 'none';
+      gameStats.startTime = Date.now();
+      gameStats.difficulty = selectedDifficulty;
+    }
+
+    function chooseStartScenario(){
+      const config = DIFFICULTY[selectedDifficulty];
+      
+      if(selectedDifficulty === 'HARD' && Math.random() < config.escalationChance){
+        showNode('AGGRESSIVE_START');
+        return;
+      }
+
+      const r = Math.floor(Math.random()*3) + 1;
+      if(r === 1){
+        showNode(DIALOG.start);
+      } else if(r === 2){
+        closeDoor();
+        showBubble('Ja, einen Moment bitte.');
+        srSpeak('Kunde: "Ja, einen Moment bitte." Warte 3 Sekunden …');
+        waitingMode = 'moment';
+        animateWait(CONFIG.momentWaitMs);
+        if(openTimerId){ clearTimeout(openTimerId); }
+        openTimerId = setTimeout(()=>{
+          waitingMode = null; openTimerId = null; hideWait();
+          showNode(DIALOG.start);
+        }, CONFIG.momentWaitMs);
+      } else {
+        closeDoor();
+        srSpeak('Bitte warten …');
+        waitingMode = 'delay';
+        animateWait(CONFIG.genericWaitMs, 'Öffnet gleich …');
+        if(openTimerId){ clearTimeout(openTimerId); }
+        openTimerId = setTimeout(()=>{
+          waitingMode = null; openTimerId = null; hideWait();
+          showNode('ROLE_CHECK');
+        }, CONFIG.genericWaitMs);
+      }
+    }
+
+    function registerKnock(clientX=null, clientY=null, from='door'){
+      if(!difficultySelected) return;
+      if(!started) startGame();
+
+      const now = Date.now();
+      if(now - lastKnockAt > CONFIG.knockDecayMs){
+        knocksTotal = 0; waitingMode = null;
+        if(openTimerId){ clearTimeout(openTimerId); openTimerId=null; }
+        hideWait();
+      }
+      lastKnockAt = now; knocksTotal++;
+      showBubble(from === 'bell' ? 'Ding Dong' : 'Klopf', clientX, clientY);
+      from==='door' ? knockSound() : bellSound();
+
+      if(waitingMode){
+        const esc = DIALOG.rules?.escalation?.find(r => r.when?.pressedBellDuringDelay);
+        if(esc){
+          if(openTimerId){ clearTimeout(openTimerId); openTimerId = null; }
+          waitingMode = null; hideWait();
+          showBubble('Ich habe gesagt: Moment!');
+          siren.classList.add('show'); playSfx('police', 0.9); setTimeout(()=> siren.classList.remove('show'), 1600);
+          openDoor();
+          srSpeak('Eskalation nach Drängeln.');
+          gameStats.endTime = Date.now();
+          gameStats.finalTrust = state.trust;
+          gameStats.outcome = 'warn';
+          showResult('warn', esc.message || 'Ungeduld triggert Eskalation.');
+          updateTrustDisplay({ drop:true });
+          showStats();
+          revealCTA();
+          return;
+        }
+      }
+
+      const maxKnocks = DIFFICULTY[selectedDifficulty]?.maxKnocks || 2;
+      if(knocksTotal >= maxKnocks){
+        chooseStartScenario();
+      }
+    }
+
+    document.querySelectorAll('.difficulty-btn').forEach(btn => {
+      btn.addEventListener('click', ()=>{
+        const diff = btn.getAttribute('data-difficulty');
+        selectedDifficulty = diff;
+        difficultySelected = true;
+        
+        const config = DIFFICULTY[diff];
+        state.trust = config.trustStart;
+        updateTrustDisplay();
+
+        startOverlay.style.display = 'none';
+        srSpeak(`${config.label} gewählt. Klopfe ${config.maxKnocks}× zum Start.`);
+      });
+    });
+
+    resetBtn.addEventListener('click', hardReset);
+    playAgain.addEventListener('click', ()=>{ hardReset(); });
+
+    door.addEventListener('click', (e)=> registerKnock(e.clientX, e.clientY, 'door'));
+    doorbell.addEventListener('click', ()=> registerKnock(null, null, 'bell'));
+
+    function init(){ hardReset(); }
+    init();
+  </script>
+</body>
+</html>
