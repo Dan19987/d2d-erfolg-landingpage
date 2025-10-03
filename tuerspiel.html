@@ -188,6 +188,71 @@
   .start-overlay h2{ margin:0; font-size: clamp(18px, 2.1vw, 22px); }
   .start-overlay p{ margin:0; color:var(--muted); }
 
+  .success-overlay{ 
+    position:absolute; inset:0; 
+    display:none; align-items:center; justify-content:center; 
+    background: linear-gradient(180deg, rgba(28,110,106,.85), rgba(28,110,106,.75)); 
+    backdrop-filter: blur(3px); 
+    pointer-events:none; text-align:center; padding:20px;
+    animation: successFade 0.4s ease-out;
+  }
+  .success-overlay.show{ display:flex; }
+  .success-overlay h2{ 
+    margin:0; font-size: clamp(24px, 4vw, 42px); 
+    color:white; font-weight:900; 
+    text-shadow: 0 2px 8px rgba(0,0,0,.4);
+    letter-spacing:1px;
+  }
+  @keyframes successFade{
+    from{ opacity:0; transform:scale(0.9); }
+    to{ opacity:1; transform:scale(1); }
+  }
+
+  .fail-overlay{ 
+    position:absolute; inset:0; 
+    display:none; align-items:center; justify-content:center; 
+    background: linear-gradient(180deg, rgba(192,57,43,.85), rgba(192,57,43,.75)); 
+    backdrop-filter: blur(3px); 
+    pointer-events:none; text-align:center; padding:20px;
+    animation: failShake 0.5s ease-out;
+  }
+  .fail-overlay.show{ display:flex; }
+  .fail-overlay h2{ 
+    margin:0; font-size: clamp(24px, 4vw, 42px); 
+    color:white; font-weight:900; 
+    text-shadow: 0 2px 8px rgba(0,0,0,.4);
+    letter-spacing:1px;
+  }
+  @keyframes failShake{
+    0%, 100% { opacity:1; transform:scale(1) translateX(0); }
+    25% { transform:scale(1.02) translateX(-8px); }
+    75% { transform:scale(1.02) translateX(8px); }
+  }
+
+  .warn-overlay{ 
+    position:absolute; inset:0; 
+    display:none; align-items:center; justify-content:center; flex-direction:column; gap:12px;
+    background: linear-gradient(180deg, rgba(230,126,34,.85), rgba(230,126,34,.75)); 
+    backdrop-filter: blur(3px); 
+    pointer-events:none; text-align:center; padding:20px;
+    animation: warnPulse 0.6s ease-out;
+  }
+  .warn-overlay.show{ display:flex; }
+  .warn-overlay h2{ 
+    margin:0; font-size: clamp(24px, 4vw, 42px); 
+    color:white; font-weight:900; 
+    text-shadow: 0 2px 8px rgba(0,0,0,.4);
+    letter-spacing:1px;
+  }
+  .warn-overlay .siren{
+    width:64px; height:24px; border-radius:8px;
+    opacity:1; transform:translateY(0);
+  }
+  @keyframes warnPulse{
+    0%, 100% { opacity:1; transform:scale(1); }
+    50% { transform:scale(1.05); }
+  }
+
   .difficulty-select{ display:grid; gap:12px; width:100%; max-width:400px; }
   .difficulty-btn {
     width:100%;
@@ -373,7 +438,7 @@
 
   .waitlabel{
     font-size:12px;
-    color:var(--muted);
+    color:white;
     text-shadow: 0 1px 0 rgba(0,0,0,.4);
   }
 
@@ -483,6 +548,19 @@
                   <small>Aggressive Abwehr, Zeitdruck, Nachbarn. Nur für Experten.</small>
                 </button>
               </div>
+            </div>
+
+            <div class="success-overlay" id="successOverlay">
+              <h2>🎉 Auftrag abgeschlossen! 🎉</h2>
+            </div>
+
+            <div class="fail-overlay" id="failOverlay">
+              <h2>❌ Tür geschlossen! ❌</h2>
+            </div>
+
+            <div class="warn-overlay" id="warnOverlay">
+              <h2>⚠️ Eskalation! ⚠️</h2>
+              <div class="siren"></div>
             </div>
 
             <div class="waitwrap" id="waitWrap" aria-live="polite">
@@ -1453,6 +1531,9 @@
     const playAgain = document.getElementById('playAgain');
     const waitWrap = document.getElementById('waitWrap');
     const waitLabel = document.getElementById('waitLabel');
+    const successOverlay = document.getElementById('successOverlay');
+    const failOverlay = document.getElementById('failOverlay');
+    const warnOverlay = document.getElementById('warnOverlay');
 
 const sfx = {
   knock:      document.getElementById('sfx-knock'),
@@ -1491,6 +1572,7 @@ const sfx = {
     let waitingMode = null;
     let openTimerId = null;
     let flavorShown = false; // Für einmalige Events wie Katze
+    let persistentKnocks = 0; // Zähler für Joke-System (wird nie zurückgesetzt)
 
     const state = { trust: 0, door: "closed", timePressure: 0 };
     let currentNode = null;
@@ -1525,16 +1607,19 @@ function openDoor(){ setDoor('open'); }
 function closeDoor(){ setDoor('closed'); }
 function ajarDoor(){ setDoor('ajar'); }
 
-    function showBubble(text, clientX=null, clientY=null){
-      const wrapRect = door.parentElement.getBoundingClientRect();
-      const rect = door.getBoundingClientRect();
-      let x = clientX != null ? Math.min(rect.right - 20, Math.max(rect.left + 20, clientX)) : (rect.left + rect.width * 0.25);
-      let y = clientY != null ? Math.min(rect.bottom - 60, Math.max(rect.top + 20, clientY)) : (rect.top + rect.height * 0.25);
-      const b = document.createElement('div'); b.className = 'bubble'; b.textContent = text;
-      b.style.left = (x - wrapRect.left - 30) + 'px';
-      b.style.top  = (y - wrapRect.top  - 40) + 'px';
-      door.parentElement.appendChild(b); setTimeout(()=> b.remove(), 1200);
-    }
+function showBubble(text, clientX=null, clientY=null, duration=1200){
+  const wrapRect = door.parentElement.getBoundingClientRect();
+  const rect = door.getBoundingClientRect();
+  let x = clientX != null ? Math.min(rect.right - 20, Math.max(rect.left + 20, clientX)) : (rect.left + rect.width * 0.25);
+  let y = clientY != null ? Math.min(rect.bottom - 60, Math.max(rect.top + 20, clientY)) : (rect.top + rect.height * 0.25);
+  const b = document.createElement('div'); 
+  b.className = 'bubble'; 
+  b.textContent = text;
+  b.style.left = (x - wrapRect.left - 30) + 'px';
+  b.style.top  = (y - wrapRect.top  - 40) + 'px';
+  door.parentElement.appendChild(b); 
+  setTimeout(()=> b.remove(), duration);  // ← Jetzt mit duration Parameter
+}
 
     function revealCTA(){ 
       ctaPrimary.setAttribute('href', CONFIG.courseUrl); 
@@ -1599,6 +1684,7 @@ function ajarDoor(){ setDoor('ajar'); }
       lastKnockAt = 0; 
       waitingMode = null;
       flavorShown = false;
+      persistentKnocks = 0; // Nur bei Hard-Reset zurücksetzen
       if(openTimerId){ clearTimeout(openTimerId); openTimerId = null; }
       state.trust = 0;
       state.door = "closed";
@@ -1739,16 +1825,30 @@ if(currentNode.autoRoute && id === 'NEIGHBOR_DECISION'){
 
         if(opt.ending === 'success'){
           
+          // Success-Overlay anzeigen
+          successOverlay.classList.add('show');
+          setTimeout(() => successOverlay.classList.remove('show'), 3000);
+          
           showResult('success', opt.note);
           playSfx('success', 0.9);
           updateTrustDisplay();
         } else if(opt.ending === 'warn'){
+          
+          // Warn-Overlay anzeigen
+          warnOverlay.classList.add('show');
+          setTimeout(() => warnOverlay.classList.remove('show'), 3000);
+          
           siren.classList.add('show');
           playSfx('police', 0.9);
           setTimeout(()=> siren.classList.remove('show'), 1500);
           showResult('warn', opt.note || 'Vorsicht.');
           updateTrustDisplay({ drop:true });
         } else if(opt.ending === 'fail'){
+          
+          // Fail-Overlay anzeigen
+          failOverlay.classList.add('show');
+          setTimeout(() => failOverlay.classList.remove('show'), 3000);
+          
           closeDoor();
           showResult('fail', opt.note || 'Gespräch beendet.');
           updateTrustDisplay({ drop:true });
@@ -1898,16 +1998,51 @@ if(selectedDifficulty === 'NORMAL' && Math.random() < 0.20){
         if(openTimerId){ clearTimeout(openTimerId); openTimerId=null; }
         hideWait();
       }
-      lastKnockAt = now; knocksTotal++;
+      lastKnockAt = now; 
+      knocksTotal++;
+      persistentKnocks++; // Joke-System Zähler
+      
       showBubble(from === 'bell' ? 'Ding Dong' : 'Klopf', clientX, clientY);
       from==='door' ? knockSound() : bellSound();
+
+      // Joke-System: Spezielle Bubbles bei bestimmten Klopf-Zahlen
+      if(persistentKnocks === 5){
+        setTimeout(() => showBubble('Wenn keiner aufmacht, dann ist wohl auch keiner da!', null, null, 3000), 200);
+      } else if(persistentKnocks === 10){
+        setTimeout(() => showBubble('Wenn du nicht aufhörst, dann ruf ich die Polizei!', null, null, 3000), 200);
+      } else if(persistentKnocks === 20){
+        setTimeout(() => showBubble('So jetzt reicht es!', null, null, 3000), 200);
+      } else if(persistentKnocks === 21){
+        // Eskalation auslösen
+        setTimeout(() => {
+          warnOverlay.classList.add('show');
+          setTimeout(() => warnOverlay.classList.remove('show'), 3000);
+          siren.classList.add('show'); 
+          playSfx('police', 0.9); 
+          setTimeout(()=> siren.classList.remove('show'), 1600);
+          showBubble('Die Polizei ist unterwegs!', null, null, 3000);
+          srSpeak('Eskalation durch übermäßiges Klopfen/Klingeln!');
+          
+          // Falls Spiel läuft, beenden
+          if(currentNode){
+            gameStats.endTime = Date.now();
+            gameStats.finalTrust = state.trust;
+            gameStats.outcome = 'warn';
+            showResult('warn', 'Übermäßiges Klopfen führt zur Eskalation.');
+            updateTrustDisplay({ drop:true });
+            showStats();
+            revealCTA();
+          }
+        }, 200);
+        return; // Kein weiteres Processing
+      }
 
       if(waitingMode){
         // Ungeduld-Eskalation bei NORMAL/HARD
         if(selectedDifficulty !== 'EASY'){
           if(openTimerId){ clearTimeout(openTimerId); openTimerId = null; }
           waitingMode = null; hideWait();
-          showBubble('Ich habe gesagt: Moment!');
+          showBubble('Ich habe gesagt: Moment!'); // Verwendet Standard 1200ms
           siren.classList.add('show'); playSfx('police', 0.9); setTimeout(()=> siren.classList.remove('show'), 1600);
           openDoor();
           srSpeak('Eskalation nach Drängeln.');
@@ -1923,7 +2058,7 @@ if(selectedDifficulty === 'NORMAL' && Math.random() < 0.20){
       }
 
       const maxKnocks = DIFFICULTY[selectedDifficulty]?.maxKnocks || 2;
-      if(knocksTotal >= maxKnocks){
+      if(knocksTotal >= maxKnocks && !currentNode){
         chooseStartScenario();
       }
     }
