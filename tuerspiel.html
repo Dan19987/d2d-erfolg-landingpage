@@ -1521,25 +1521,25 @@ const sfx = {
     function srSpeak(text){ customerLine.textContent = text; }
     
 function setDoor(status){
-  // Prüfen, ob sich der Status tatsächlich ändert
   const currentStatus = state.door;
   
   if(currentStatus === status) {
     return; // Keine Änderung, kein Sound
   }
   
-  // Status visuell ändern
   door.classList.remove('closed', 'ajar', 'open');
   door.classList.add(status);
   state.door = status;
   
-  // Sound-Logik mit speziellem doorsound für ajar → open
-  if(currentStatus === 'ajar' && status === 'open') {
-    playSfx('doorsound', 0.8);  // Spezieller Sound für ajar → open
-  } else if(status === 'open') {
-    playSfx('dooropen', 0.8);
+  // Sound-Logik
+  if(currentStatus === 'closed' && status === 'ajar') {
+    playSfx('dooropen', 0.8);   // closed → ajar
+  } else if(currentStatus === 'ajar' && status === 'open') {
+    playSfx('doorsound', 0.8);  // ajar → open
+  } else if(currentStatus === 'closed' && status === 'open') {
+    playSfx('dooropen', 0.8);   // closed → open (direkt)
   } else if(status === 'closed') {
-    playSfx('doorclosed', 0.7);
+    playSfx('doorclosed', 0.7); // ??? → closed
   }
 }
 
