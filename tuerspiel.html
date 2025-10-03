@@ -127,34 +127,36 @@
   }
   .trust-indicator.shake { animation: trustShake 0.3s ease-in-out; }
 
-  .door{
-    height:100%;
-    aspect-ratio:1 / 2;
-    width:auto; max-height:none;
-    max-width: calc(100% - 122px);
-    background: linear-gradient(180deg, #1f2937 0%, #0f172a 100%);
-    border: 2px solid rgba(255,255,255,.12);
-    border-radius: 12px;
-    position:relative;
-    box-shadow: 0 30px 60px rgba(0,0,0,.6), inset 0 0 0 2px rgba(255,255,255,.06);
-    transform-origin: left center;
-    transition: transform 420ms cubic-bezier(.22,.95,.18,.99), filter .2s;
-  }
+.door{
+  height:100%;
+  aspect-ratio:1 / 2;
+  width:auto; max-height:none;
+  max-width: calc(100% - 122px);
+  background: linear-gradient(180deg, #1f2937 0%, #0f172a 100%);
+  /* border: 2px solid rgba(255,255,255,.12); ← ENTFERNT */
+  border-radius: 12px;
+  position:relative;
+  box-shadow: 0 30px 60px rgba(0,0,0,.6), inset 0 0 0 2px rgba(255,255,255,.06);
+  transform-origin: left center;
+  transition: transform 420ms cubic-bezier(.22,.95,.18,.99), filter .2s;
+  overflow: hidden;  /* NEU: Bild kann nicht über Tür hinausragen */
+}
+
   .door.open{ transform: perspective(1200px) rotateY(-45deg) translateX(-2px); filter: brightness(1.08); }
   .door.ajar{ transform: perspective(1200px) rotateY(-22deg) translateX(-1px); filter: brightness(1.02); }
   .door.closed{ transform: perspective(1200px) rotateY(0deg); }
   
 .panel{ 
-    position:absolute; 
-    left:14px; right:14px; top:14px; bottom:14px; 
-    border-radius:8px; 
-    border:1px solid rgba(255,255,255,.08);
-    background: 
-      url('/assets/tuercover.png') center center no-repeat,
-      repeating-linear-gradient(to bottom, rgba(255,255,255,.03) 0 8px, rgba(255,255,255,.02) 8px 16px);
-    background-size: 100% 100%, auto;  /* Bild wird exakt auf Panel-Größe gestreckt */
-    background-blend-mode: multiply;   /* Natürliche Schattierung */
-    box-shadow: inset 0 0 0 2px rgba(0,0,0,.35);
+  position:absolute; 
+  left:0; right:0; top:0; bottom:0;  /* NEU: Kein Abstand mehr */
+  border-radius:12px;  /* NEU: Gleicher Radius wie Tür */
+  /* border:1px solid rgba(255,255,255,.08); ← ENTFERNT */
+  background: 
+    url('/assets/tuercover.png') center center no-repeat,
+    repeating-linear-gradient(to bottom, rgba(255,255,255,.03) 0 8px, rgba(255,255,255,.02) 8px 16px);
+  background-size: 100% 100%, auto;
+  background-blend-mode: multiply;
+  /* box-shadow: inset 0 0 0 2px rgba(0,0,0,.35); ← ENTFERNT */
 }
   
 
