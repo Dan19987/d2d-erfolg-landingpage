@@ -144,7 +144,7 @@
   .door.ajar{ transform: perspective(1200px) rotateY(-8deg) translateX(-1px); filter: brightness(1.02); }
   .door.closed{ transform: perspective(1200px) rotateY(0deg); }
   
-  .panel{ 
+.panel{ 
     position:absolute; 
     left:14px; right:14px; top:14px; bottom:14px; 
     border-radius:8px; 
@@ -153,9 +153,9 @@
       url('/assets/tuercover.png') center/cover no-repeat,
       repeating-linear-gradient(to bottom, rgba(255,255,255,.03) 0 8px, rgba(255,255,255,.02) 8px 16px);
     box-shadow: inset 0 0 0 2px rgba(0,0,0,.35);
-  }
+    background-blend-mode: multiply;
+}
   
-  .knob{ position:absolute; right:18px; top:50%; width:14px; height:14px; background: radial-gradient(circle at 30% 30%, #ffe8a3, #c0841a); border-radius:50%; box-shadow:0 1px 0 rgba(255,255,255,.35) inset, 0 0 0 2px rgba(0,0,0,.35); }
 
   .sign{
     position:absolute; top:32px; left:50%; transform:translateX(-50%) rotate(-2.5deg);
