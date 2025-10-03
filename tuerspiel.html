@@ -546,6 +546,7 @@
 <audio id="sfx-bell"        src="/assets/audio/dingdong2.mp3"   preload="auto"></audio>
 <audio id="sfx-dooropen"    src="/assets/audio/dooropen.mp3"    preload="auto"></audio>
 <audio id="sfx-doorclosed"  src="/assets/audio/doorclosed.mp3"  preload="auto"></audio>
+<audio id="sfx-doorsound"   src="/assets/audio/doorsound.mp3"   preload="auto"></audio>
 <audio id="sfx-police"      src="/assets/audio/police.mp3"      preload="auto"></audio>
 <audio id="sfx-success"     src="/assets/audio/success.mp3"     preload="auto"></audio>
 
@@ -1447,14 +1448,15 @@
     const waitFill = document.getElementById('waitFill');
     const waitLabel = document.getElementById('waitLabel');
 
-    const sfx = {
-      knock:      document.getElementById('sfx-knock'),
-      bell:       document.getElementById('sfx-bell'),
-      dooropen:   document.getElementById('sfx-dooropen'),
-      doorclosed: document.getElementById('sfx-doorclosed'),
-      police:     document.getElementById('sfx-police'),
-      success:    document.getElementById('sfx-success'),
-    };
+const sfx = {
+  knock:      document.getElementById('sfx-knock'),
+  bell:       document.getElementById('sfx-bell'),
+  dooropen:   document.getElementById('sfx-dooropen'),
+  doorclosed: document.getElementById('sfx-doorclosed'),
+  doorsound:  document.getElementById('sfx-doorsound'),  // NEU
+  police:     document.getElementById('sfx-police'),
+  success:    document.getElementById('sfx-success'),
+};
     
     function playSfx(name, vol = 1){
       const el = sfx[name]; 
@@ -1493,12 +1495,26 @@
     function srSpeak(text){ customerLine.textContent = text; }
     
 function setDoor(status){
+  // Prüfen, ob sich der Status tatsächlich ändert
+  const currentStatus = state.door;
+  
+  if(currentStatus === status) {
+    return; // Keine Änderung, kein Sound
+  }
+  
+  // Status visuell ändern
   door.classList.remove('closed', 'ajar', 'open');
   door.classList.add(status);
   state.door = status;
   
-  if(status === 'open') playSfx('dooropen', 0.8);
-  else if(status === 'closed') playSfx('doorclosed', 0.7);
+  // Sound-Logik mit speziellem doorsound für ajar → open
+  if(currentStatus === 'ajar' && status === 'open') {
+    playSfx('doorsound', 0.8);  // Spezieller Sound für ajar → open
+  } else if(status === 'open') {
+    playSfx('dooropen', 0.8);
+  } else if(status === 'closed') {
+    playSfx('doorclosed', 0.7);
+  }
 }
 
 function openDoor(){ setDoor('open'); }
