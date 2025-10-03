@@ -1657,7 +1657,7 @@ function applyDoorFromNode(node){
       for(const [k,v] of Object.entries(on)){
         if(k.endsWith("+")){ const key = k.replace("+",""); state[key] = (state[key]||0) + v; }
         else if(k.endsWith("-")){ const key = k.replace("-",""); state[key] = (state[key]||0) - v; }
-        else if(k === "door"){ state.door = v; if(v === "open") openDoor(); else closeDoor(); }
+        else if(k === "door"){ setDoor(v); }
         else { state[k] = v; }
       }
       updateTrustDisplay();
