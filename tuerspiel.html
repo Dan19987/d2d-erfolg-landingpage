@@ -1545,47 +1545,17 @@ const sfx = {
   success:    document.getElementById('sfx-success'),
 };
     
-function playSfx(name, vol = 1){
-  const el = sfx[name]; 
-  if(!el || !el.src || el.error) return;
-  
-  try{ 
-    // Force load wenn noch nicht geladen (für Safari)
-    if(el.readyState < 3) {
-      el.load();
-    }
-    
-    el.pause(); 
-    el.currentTime = 0; 
-    el.volume = vol; 
-    el.play().catch(()=>{}); 
-  } catch(e) {}
+    function playSfx(name, vol = 1){
+      const el = sfx[name]; 
+      if(!el || !el.src || el.error) return;
+      try{ 
+        el.pause(); 
+        el.currentTime = 0; 
+        el.volume = vol; 
+        el.play().catch(()=>{}); 
+      } catch(e) {}
 }
 
-    // Direkt nach der sfx-Deklaration einfügen:
-let audioUnlocked = false;
-
-function unlockAudio() {
-  if(audioUnlocked) return;
-  
-  // Alle Audio-Elemente durchgehen und kurz abspielen (stumm)
-  Object.values(sfx).forEach(audio => {
-    if(!audio || !audio.src) return;
-    audio.volume = 0;
-    audio.play().then(() => {
-      audio.pause();
-      audio.currentTime = 0;
-      audio.volume = 1; // Reset auf normale Lautstärke
-    }).catch(()=>{});
-  });
-  
-  audioUnlocked = true;
-  console.log('🔊 Audio unlocked für iOS/Safari');
-}
-
-// Event-Listener für ersten Klick/Touch hinzufügen
-document.addEventListener('click', unlockAudio, { once: true });
-document.addEventListener('touchstart', unlockAudio, { once: true });
     
     function knockSound(){ playSfx('knock', 0.9); }
     function bellSound(){  playSfx('bell',  0.9); }
