@@ -1544,16 +1544,28 @@ const sfx = {
   police:     document.getElementById('sfx-police'),
   success:    document.getElementById('sfx-success'),
 };
-    
-    function playSfx(name, vol = 1){
-      const el = sfx[name]; 
-      if(!el || !el.src || el.error) return;
-      try{ 
-        el.pause(); 
-        el.currentTime = 0; 
-        el.volume = vol; 
-        el.play().catch(()=>{}); 
-      } catch(e) {}
+let audioUnlocked = false;
+
+function unlockAudio() {
+  if(audioUnlocked) return;
+  // Einfaches Audio-Unlock für alle Browser
+  Object.values(sfx).forEach(audio => {
+    if(audio && audio.src) {
+      audio.load();
+      audio.play().then(() => audio.pause()).catch(() => {});
+    }
+  });
+  audioUnlocked = true;
+}
+
+function playSfx(name, vol = 1){
+  const original = sfx[name]; 
+  if(!original || !original.src) return;
+  
+  // Audio clonen statt currentTime = 0 (viel schneller!)
+  const audio = original.cloneNode();
+  audio.volume = vol;
+  audio.play().catch(() => {});
 }
 
     
@@ -2066,6 +2078,7 @@ if(selectedDifficulty === 'NORMAL' && Math.random() < 0.20){
 
     document.querySelectorAll('.difficulty-btn').forEach(btn => {
       btn.addEventListener('click', ()=>{
+        unlockAudio();
         const diff = btn.getAttribute('data-difficulty');
         selectedDifficulty = diff;
         difficultySelected = true;
