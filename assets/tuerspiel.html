@@ -3,393 +3,603 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>D2D-Erfolg – Türspiel Advanced</title>
-  <style>
-    :root{
-      --bg:#0f172a;
-      --card:#111827;
-      --muted:#94a3b8;
-      --text:#e5e7eb;
-      --accent:#06b6d4;
-      --accent-strong:#0891b2;
-      --danger:#ef4444;
-      --success:#22c55e;
-      --warning:#f59e0b;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%;}
-    body{
-      margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      background: radial-gradient(1200px 800px at 80% -10%, #1f2937 0%, var(--bg) 60%);
-      color:var(--text);
-      display:flex; 
-      justify-content:flex-start; 
-      align-items:flex-start;
-      padding-block: 12px;
-    }
+<style>
+  :root{
+    /* Hauptseiten-Farbpalette */
+    --door-green:#1c6e6a;
+    --door-green-2:#115150;
+    --ink:#0f172a;
+    --muted:#55636e;
+    --paper:#f0fffe;
+    --bg:#f5f7f8;
+    --accent:#c0392b;
+    --accent-2:#e67e22;
+    --radius:18px;
+    --shadow:0 10px 30px rgba(0,0,0,.08);
     
-    @media (min-width:860px){
-      body{
-        align-items:center;
-      }
+    /* Zusätzliche für Spiel */
+    --card-bg: rgba(240,255,254,0.95);
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+  }
+  
+  *{box-sizing:border-box}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    background: var(--bg);
+    color: var(--ink);
+    display:flex; 
+    justify-content:flex-start; 
+    align-items:flex-start;
+    padding-block: 12px;
+  }
+  
+  @media (min-width:860px){
+    body{
+      align-items:center;
     }
+  }
 
-    .app{
-      width:min(950px, 100%);
-      padding: clamp(16px, 2vw, 28px);
-      min-height:100dvh;
-      display:flex; flex-direction:column;
-    }
-    .card{
-      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
-      border:1px solid rgba(255,255,255,0.08);
-      border-radius:20px;
-      padding:clamp(16px, 2.5vw, 28px);
-      box-shadow: 0 10px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.04);
-      display:flex; flex-direction:column;
-      flex:1; min-height:0;
-    }
+  .app{
+    width:min(950px, 100%);
+    padding: clamp(16px, 2vw, 28px);
+    min-height:100dvh;
+    display:flex; flex-direction:column;
+  }
+  
+  .card{
+    background: var(--card-bg);
+    border: 1px solid rgba(28,110,106,0.1);
+    border-radius: var(--radius);
+    padding: clamp(16px, 2.5vw, 28px);
+    box-shadow: var(--shadow);
+    display:flex; flex-direction:column;
+    flex:1; min-height:0;
+    backdrop-filter: blur(8px);
+  }
 
-    .header{ display:flex; gap:16px; align-items:center; justify-content:space-between; margin-bottom:18px; }
-    .brand{ display:flex; align-items:center; gap:12px; }
-    .brand .logo{ width:42px; height:42px; border-radius:12px; background: conic-gradient(from 0deg, var(--accent), #38bdf8, #67e8f9, var(--accent)); box-shadow:0 0 18px rgba(6,182,212,.35) inset; }
-    .brand h1{ font-size: clamp(18px, 2.2vw, 24px); margin:0; letter-spacing:.2px; line-height:1.2; }
-    .subtitle{ color:var(--muted); font-size:14px; margin-top:4px; }
+  .header{ 
+    display:flex; gap:16px; align-items:center; justify-content:space-between; margin-bottom:18px; 
+  }
+  .brand{ display:flex; align-items:center; gap:12px; }
+  .brand .logo{ 
+    width:42px; height:42px; border-radius:12px; 
+    background: linear-gradient(145deg, var(--door-green), var(--door-green-2)); 
+    box-shadow: 0 4px 12px rgba(28,110,106,.25); 
+  }
+  .brand h1{ 
+    font-size: clamp(18px, 2.2vw, 24px); 
+    margin:0; 
+    letter-spacing:.2px; 
+    line-height:1.2; 
+    color: var(--ink);
+  }
+  .subtitle{ color:var(--muted); font-size:14px; margin-top:4px; }
 
-    .stage{
-      flex:1; min-height:0;
-      display:grid; gap:18px;
-      grid-template-columns: 1fr;
-    }
-    @media (min-width:860px){
-      .stage{ grid-template-columns: 1.15fr .85fr; }
-    }
+  .stage{
+    flex:1; min-height:0;
+    display:grid; gap:18px;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width:860px){
+    .stage{ grid-template-columns: 1.15fr .85fr; }
+  }
 
-    .scene{
-      position:relative;
-      border-radius:18px; overflow:hidden;
-      background:
-        radial-gradient(1200px 500px at -10% 110%, #0b1222 0%, #0b1222 60%, transparent 70%),
-        linear-gradient(180deg, #0b1222, #0b1222);
-      border:1px solid rgba(255,255,255,.06);
-      min-height:360px;
-      height:auto;
-    }
-    .floor{ position:absolute; left:0; right:0; bottom:0; height:28%; background:linear-gradient(180deg,#0c1426 0%, #0a1222 40%, #070e1d 100%); box-shadow:0 -20px 50px rgba(0,0,0,.5) inset; }
+  .scene{
+    position:relative;
+    border-radius: var(--radius); 
+    overflow:hidden;
+    background: linear-gradient(145deg, 
+      color-mix(in oklab, var(--door-green) 90%, white 10%), 
+      var(--door-green-2)
+    );
+    border: 1px solid rgba(28,110,106,0.2);
+    min-height:360px;
+    height:auto;
+    box-shadow: var(--shadow);
+  }
+  
+  .floor{ 
+    position:absolute; left:0; right:0; bottom:0; height:28%; 
+    background: linear-gradient(180deg, 
+      color-mix(in oklab, var(--door-green-2) 80%, black 20%) 0%, 
+      color-mix(in oklab, var(--door-green-2) 90%, black 10%) 40%, 
+      var(--door-green-2) 100%
+    ); 
+    box-shadow: 0 -20px 50px rgba(0,0,0,.2) inset; 
+  }
 
-    .door-wrap{
-      position:absolute; inset:clamp(14px, 2vw, 22px);
-      display:flex; align-items:stretch; justify-content:center; gap:18px;
-    }
+  .door-wrap{
+    position:absolute; inset:clamp(14px, 2vw, 22px);
+    display:flex; align-items:stretch; justify-content:center; gap:18px;
+  }
 
-    .trust-indicator{
-      width:32px; height:100%;
-      display:flex; flex-direction:column; align-items:center; gap:8px;
-      padding:10px 6px;
-      background: rgba(2,6,23,.55);
-      border: 1px solid rgba(255,255,255,.18);
-      border-radius: 12px;
-      backdrop-filter: blur(4px);
-    }
-    .trust-label{
-      writing-mode: vertical-rl;
-      text-orientation: mixed;
-      transform: rotate(180deg);
-      font-size:10px; color:var(--muted); font-weight:700; letter-spacing:.6px;
-    }
-    .trust-meter{
-      position:relative; width:12px; flex:1;
-      background: rgba(255,255,255,.10);
-      border-radius: 999px; overflow:hidden;
-    }
-    .trust-fill{
-      position:absolute; left:0; right:0; bottom:0;
-      height:0%;
-      border-radius:999px;
-      background: linear-gradient(to top, var(--danger), var(--warning), var(--success));
-      box-shadow: 0 0 10px rgba(34,197,94,.55);
-      transition: height .28s cubic-bezier(.22,.95,.18,.99);
-    }
-    .trust-fill.low  { box-shadow: 0 0 10px rgba(239,68,68,.55); }
-    .trust-fill.high { box-shadow: 0 0 10px rgba(34,197,94,.85); }
-    .trust-value{ font-size:12px; font-weight:800; line-height:1; }
-    .trust-emoji{ font-size:18px; }
+  .trust-indicator{
+    width:32px; height:100%;
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+    padding:10px 6px;
+    background: rgba(255,255,255,.9);
+    border: 1px solid rgba(28,110,106,.3);
+    border-radius: 12px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 12px rgba(28,110,106,.15);
+  }
+  .trust-label{
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+    font-size:10px; color:var(--muted); font-weight:700; letter-spacing:.6px;
+  }
+  .trust-meter{
+    position:relative; width:12px; flex:1;
+    background: rgba(28,110,106,.15);
+    border-radius: 999px; overflow:hidden;
+  }
+  .trust-fill{
+    position:absolute; left:0; right:0; bottom:0;
+    height:0%;
+    border-radius:999px;
+    background: linear-gradient(to top, var(--danger), var(--warning), var(--success));
+    box-shadow: 0 0 10px rgba(34,197,94,.4);
+    transition: height .28s cubic-bezier(.22,.95,.18,.99);
+  }
+  .trust-fill.low  { box-shadow: 0 0 10px rgba(239,68,68,.4); }
+  .trust-fill.high { box-shadow: 0 0 10px rgba(34,197,94,.6); }
+  .trust-value{ font-size:12px; font-weight:800; line-height:1; color: var(--ink); }
+  .trust-emoji{ font-size:18px; }
 
-    @keyframes trustShake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-4px); }
-      50% { transform: translateX(4px); }
-      75% { transform: translateX(-2px); }
-    }
-    .trust-indicator.shake { animation: trustShake 0.3s ease-in-out; }
+  @keyframes trustShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    50% { transform: translateX(4px); }
+    75% { transform: translateX(-2px); }
+  }
+  .trust-indicator.shake { animation: trustShake 0.3s ease-in-out; }
 
-    .door{
-      height:100%;
-      aspect-ratio:1 / 2;
-      width:auto; max-height:none;
-      max-width: calc(100% - 122px);
-      background: linear-gradient(180deg, #1f2937 0%, #0f172a 100%);
-      border: 2px solid rgba(255,255,255,.12);
-      border-radius: 12px;
-      position:relative;
-      box-shadow: 0 30px 60px rgba(0,0,0,.6), inset 0 0 0 2px rgba(255,255,255,.06);
-      transform-origin: left center;
-      transition: transform 420ms cubic-bezier(.22,.95,.18,.99), filter .2s;
-    }
-    .door.open{ transform: perspective(1200px) rotateY(-22deg) translateX(-2px); filter: brightness(1.08); }
-    .door.closed{ transform: perspective(1200px) rotateY(0deg); }
-    .panel{ position:absolute; left:14px; right:14px; top:14px; bottom:14px; border-radius:8px; border:1px solid rgba(255,255,255,.08);
-      background: repeating-linear-gradient( to bottom, rgba(255,255,255,.03) 0 8px, rgba(255,255,255,.02) 8px 16px );
-      box-shadow: inset 0 0 0 2px rgba(0,0,0,.35);
-    }
-    .knob{ position:absolute; right:18px; top:50%; width:14px; height:14px; background: radial-gradient(circle at 30% 30%, #ffe8a3, #c0841a); border-radius:50%; box-shadow:0 1px 0 rgba(255,255,255,.35) inset, 0 0 0 2px rgba(0,0,0,.35); }
+  .door{
+    height:100%;
+    aspect-ratio:1 / 2;
+    width:auto; max-height:none;
+    max-width: calc(100% - 122px);
+    background: linear-gradient(180deg, var(--paper) 0%, #f0f0f0 100%);
+    border-radius: 12px;
+    position:relative;
+    box-shadow: 0 15px 30px rgba(0,0,0,.15), inset 0 0 0 2px rgba(28,110,106,.1);
+    transform-origin: left center;
+    transition: transform 420ms cubic-bezier(.22,.95,.18,.99), filter .2s;
+    z-index: 2;
+  }
 
-    .sign{
-      position:absolute; top:32px; left:50%; transform:translateX(-50%) rotate(-2.5deg);
-      background: #0b1222; color: var(--text);
-      border: 1px dashed rgba(255,255,255,.25);
-      border-radius:10px; padding:8px 12px; font-weight:600; font-size:13px; letter-spacing:.3px;
-      box-shadow: 0 8px 18px rgba(0,0,0,.35);
-    }
-    .sign::after{ content:"✋"; margin-left:8px; opacity:.9 }
+  .door.open{ transform: perspective(1200px) rotateY(-45deg) translateX(-2px); filter: brightness(1.05); }
+  .door.ajar{ transform: perspective(1200px) rotateY(-22deg) translateX(-1px); filter: brightness(1.02); }
+  .door.closed{ transform: perspective(1200px) rotateY(0deg); }
+  
+  .cat-peek{
+    position: absolute;
+    right: -60px;
+    top: 80%;
+    width: 112px;
+    height: 112px;
+    transform: translateY(-50%);
+    opacity: 0;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .cat-peek.show{
+    opacity: 1;
+    transform: translateY(-50%) translateX(4px);
+    animation: catCurious 2s ease-in-out infinite;
+  }
+  .cat-peek img{
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+  }
+  @keyframes catCurious{
+    0%, 100% { transform: translateY(-50%) translateX(4px); }
+    50% { transform: translateY(-50%) translateX(8px); }
+  }
+  
+  .panel{ 
+    position:absolute; 
+    left:0; right:0; top:0; bottom:0;
+    border-radius:12px;
+    background: 
+      url('/assets/tuercover.png') center center no-repeat,
+      repeating-linear-gradient(to bottom, rgba(28,110,106,.02) 0 8px, rgba(28,110,106,.01) 8px 16px);
+    background-size: 100% 100%, auto;
+    background-blend-mode: multiply;
+    z-index: 5;
+  }
 
-    .doorbell{
-      position:relative; width:54px; height:120px; display:flex; align-items:center; justify-content:center;
-      border-radius:16px; border:1px solid rgba(255,255,255,.12);
-      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
-      box-shadow: 0 10px 26px rgba(0,0,0,.35);
-      cursor:pointer; user-select:none;
-    }
-    .doorbell:active{ transform: translateY(1px); }
-    .ding{
-      width:30px; height:30px; border-radius:50%;
-      background: radial-gradient(circle at 30% 30%, #ffffff, #cbd5e1);
-      box-shadow: inset 0 0 0 2px rgba(0,0,0,.28), 0 0 0 4px rgba(6,182,212,.25);
-      display:flex; align-items:center; justify-content:center; font-weight:900; color:#0b1222;
-    }
-    .doorbell .hint{ position:absolute; bottom:8px; font-size:10px; color:var(--muted); }
+  .doorbell{
+    position:relative; width:54px; height:120px; display:flex; align-items:center; justify-content:center;
+    border-radius:16px; border:1px solid rgba(28,110,106,.2);
+    background: linear-gradient(180deg, var(--paper), #f8f9fa);
+    box-shadow: 0 6px 20px rgba(0,0,0,.1);
+    cursor:pointer; user-select:none;
+  }
+  .doorbell:active{ transform: translateY(1px); }
+  .ding{
+    width:30px; height:30px; border-radius:50%;
+    background: radial-gradient(circle at 30% 30%, #ffffff, #e2e8f0);
+    box-shadow: inset 0 0 0 2px rgba(28,110,106,.3), 0 0 0 4px rgba(28,110,106,.15);
+    display:flex; align-items:center; justify-content:center; font-weight:900; color: var(--door-green);
+  }
+  .doorbell .hint{ position:absolute; bottom:8px; font-size:10px; color:var(--muted); }
 
-    .ui{ position:absolute; inset:12px; pointer-events:none; }
-    .btn{ appearance:none; border:none; border-radius:12px; padding:12px 16px; font-weight:700; letter-spacing:.2px; color:#0b1222; background:linear-gradient(180deg, #67e8f9, var(--accent)); cursor:pointer; box-shadow:0 8px 16px rgba(6,182,212,.35); transition: transform .06s ease, box-shadow .2s; }
-    .btn-ghost{ background:transparent; color:var(--text); border:1px solid rgba(255,255,255,.18); box-shadow:none; }
+  .ui{ position:absolute; inset:12px; pointer-events:none; }
+  .btn{ 
+    appearance:none; border:none; border-radius:12px; 
+    padding:12px 16px; font-weight:700; letter-spacing:.2px; 
+    color:white; 
+    background: linear-gradient(145deg, var(--door-green), var(--door-green-2)); 
+    cursor:pointer; 
+    box-shadow: 0 4px 12px rgba(28,110,106,.25); 
+    transition: transform .06s ease, box-shadow .2s; 
+  }
+  .btn-ghost{ 
+    background: var(--paper); 
+    color: var(--ink); 
+    border:1px solid rgba(28,110,106,.2); 
+    box-shadow: var(--shadow); 
+  }
 
-    .start-overlay{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:14px; background: linear-gradient(180deg, rgba(2,6,23,.65), rgba(2,6,23,.55)); backdrop-filter: blur(2px); pointer-events:auto; text-align:center; padding:16px; }
-    .start-overlay h2{ margin:0; font-size: clamp(18px, 2.1vw, 22px); }
-    .start-overlay p{ margin:0; color:var(--muted); }
+  .start-overlay{ 
+    position:absolute; inset:0; 
+    display:flex; align-items:center; justify-content:center; flex-direction:column; gap:14px; 
+    background: rgba(255,255,255,.95); 
+    backdrop-filter: blur(8px); 
+    pointer-events:auto; text-align:center; padding:16px; 
+    z-index: 100;
+  }
+  .start-overlay h2{ margin:0; font-size: clamp(18px, 2.1vw, 22px); color: var(--ink); }
+  .start-overlay p{ margin:0; color:var(--muted); }
 
-    .difficulty-select{ display:grid; gap:12px; width:100%; max-width:400px; }
-    .difficulty-btn {
-      width:100%;
-      text-align:left;
-      padding:16px 20px;
-      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
-      border:2px solid rgba(255,255,255,.12);
-      border-radius:16px;
-      cursor:pointer;
-      transition: all .2s;
-      color:var(--text);
-    }
-    .difficulty-btn:hover {
-      border-color: var(--accent);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(6,182,212,.25);
-    }
-    .difficulty-btn strong {
-      display:block;
-      font-size:18px;
-      margin-bottom:6px;
-    }
-    .difficulty-btn small {
-      display:block;
-      color:var(--muted);
-      font-size:13px;
-      line-height:1.4;
-    }
+  .success-overlay{ 
+    position:absolute; inset:0; 
+    display:none; align-items:center; justify-content:center; 
+    background: linear-gradient(145deg, rgba(34,197,94,.9), rgba(22,163,74,.85)); 
+    backdrop-filter: blur(8px); 
+    pointer-events:none; text-align:center; padding:20px;
+    animation: successFade 0.4s ease-out;
+    z-index: 100;
+  }
+  .success-overlay.show{ display:flex; }
+  .success-overlay h2{ 
+    margin:0; font-size: clamp(24px, 4vw, 42px); 
+    color:white; font-weight:900; 
+    text-shadow: 0 2px 8px rgba(0,0,0,.3);
+    letter-spacing:1px;
+  }
 
-    .bubble{ position:absolute; background:#0b1222; color:var(--text); border:1px solid rgba(255,255,255,.14); padding:8px 12px; border-radius:14px; font-weight:700; box-shadow: 0 8px 18px rgba(0,0,0,.35); animation: pop .18s ease-out; pointer-events:none; }
-    .bubble::after{ content:""; position:absolute; width:10px; height:10px; background:#0b1222; border-left:1px solid rgba(255,255,255,.14); border-bottom:1px solid rgba(255,255,255,.14); transform: rotate(45deg); bottom:-5px; left:12px; }
-    @keyframes pop{ from{ transform: scale(.85); opacity:0 } to{ transform: scale(1); opacity:1 } }
+  .fail-overlay{ 
+    position:absolute; inset:0; 
+    display:none; align-items:center; justify-content:center; 
+    background: linear-gradient(145deg, rgba(239,68,68,.9), rgba(220,38,38,.85)); 
+    backdrop-filter: blur(8px); 
+    pointer-events:none; text-align:center; padding:20px;
+    animation: failShake 0.5s ease-out;
+    z-index: 100;
+  }
+  .fail-overlay.show{ display:flex; }
+  .fail-overlay h2{ 
+    margin:0; font-size: clamp(24px, 4vw, 42px); 
+    color:white; font-weight:900; 
+    text-shadow: 0 2px 8px rgba(0,0,0,.3);
+    letter-spacing:1px;
+  }
 
-    .stack{
-      display:flex; flex-direction:column; gap:16px;
-      min-height:0; overflow:auto;
-    }
-    @media (max-width: 859px){
-      .stack{ overflow: visible; }
-    }
+  .warn-overlay{ 
+    position:absolute; inset:0; 
+    display:none; align-items:center; justify-content:center; flex-direction:column; gap:12px;
+    background: linear-gradient(145deg, rgba(245,158,11,.9), rgba(217,119,6,.85)); 
+    backdrop-filter: blur(8px); 
+    pointer-events:none; text-align:center; padding:20px;
+    animation: warnPulse 0.6s ease-out;
+    z-index: 100;
+  }
+  .warn-overlay.show{ display:flex; }
+  .warn-overlay h2{ 
+    margin:0; font-size: clamp(24px, 4vw, 42px); 
+    color:white; font-weight:900; 
+    text-shadow: 0 2px 8px rgba(0,0,0,.3);
+    letter-spacing:1px;
+  }
 
-    .dialog{ background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); border:1px solid rgba(255,255,255,.10); border-radius:16px; padding:14px; display:flex; flex-direction:column; gap:10px; }
-    .dialog h3{ margin:0 0 2px 0; font-size:16px; letter-spacing:.2px; }
-    .options{ display:grid; gap:10px; }
-    .option{ width:100%; text-align:left; padding:12px 14px; background:#0b1222; color:var(--text); border:1px solid rgba(255,255,255,.12); border-radius:12px; cursor:pointer; transition: transform .05s ease, border-color .2s; }
-    .option:hover{ transform: translateY(-1px); border-color: rgba(6,182,212,.45); }
+  @keyframes successFade{
+    from{ opacity:0; transform:scale(0.9); }
+    to{ opacity:1; transform:scale(1); }
+  }
+  @keyframes failShake{
+    0%, 100% { opacity:1; transform:scale(1) translateX(0); }
+    25% { transform:scale(1.02) translateX(-8px); }
+    75% { transform:scale(1.02) translateX(8px); }
+  }
+  @keyframes warnPulse{
+    0%, 100% { opacity:1; transform:scale(1); }
+    50% { transform:scale(1.05); }
+  }
 
-    .result{ display:none; gap:10px; align-items:center; }
-    .result.show{ display:flex; }
-    .badge{ font-weight:800; font-size:12px; padding:6px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.16); }
-    .badge.success{ background: rgba(34,197,94,.12); color:#86efac; border-color: rgba(34,197,94,.35); }
-    .badge.fail{ background: rgba(239,68,68,.12); color:#fecaca; border-color: rgba(239,68,68,.35); }
-    .badge.warn{ background: rgba(245,158,11,.12); color:#fde68a; border-color: rgba(245,158,11,.35); }
+  .difficulty-select{ display:grid; gap:12px; width:100%; max-width:400px; }
+  .difficulty-btn {
+    width:100%;
+    text-align:left;
+    padding:16px 20px;
+    background: var(--paper);
+    border: 2px solid rgba(28,110,106,.15);
+    border-radius: var(--radius);
+    cursor:pointer;
+    transition: all .2s;
+    color: var(--ink);
+    box-shadow: 0 2px 8px rgba(0,0,0,.05);
+  }
+  .difficulty-btn:hover {
+    border-color: var(--door-green);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(28,110,106,.15);
+  }
+  .difficulty-btn strong {
+    display:block;
+    font-size:18px;
+    margin-bottom:6px;
+    color: var(--ink);
+  }
+  .difficulty-btn small {
+    display:block;
+    color:var(--muted);
+    font-size:13px;
+    line-height:1.4;
+  }
 
-    .stats-grid {
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap:12px;
-      margin:16px 0;
-    }
-    @media (max-width:640px){
-      .stats-grid { grid-template-columns: 1fr; }
-    }
-    .stat-box {
-      background: rgba(6,182,212,.08);
-      border:1px solid rgba(6,182,212,.25);
-      border-radius:12px;
-      padding:14px;
-      text-align:center;
-    }
-    .stat-value {
-      font-size:32px;
-      font-weight:800;
-      color:var(--accent);
-      line-height:1;
-      margin-bottom:6px;
-    }
-    .stat-label {
-      font-size:12px;
-      color:var(--muted);
-      text-transform:uppercase;
-      letter-spacing:.5px;
-    }
-    .result-summary {
-      background: linear-gradient(145deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
-      border-radius:12px;
-      padding:16px;
-      text-align:center;
-      margin:16px 0;
-    }
-    .stat-actions {
-      display:flex;
-      gap:10px;
-      margin-top:14px;
-      flex-wrap:wrap;
-    }
-    #allTimeStats {
-      margin-top:20px;
-      padding-top:16px;
-      border-top:1px solid rgba(255,255,255,.1);
-    }
-    #allTimeStats h4 {
-      margin:0 0 12px;
-      font-size:14px;
-      color:var(--muted);
-      text-transform:uppercase;
-      letter-spacing:.5px;
-    }
-    #allTimeStats > div {
-      display:flex;
-      justify-content:space-between;
-      padding:8px 0;
-      border-bottom:1px solid rgba(255,255,255,.05);
-    }
+  .bubble{ 
+    position:absolute; 
+    background: var(--paper); 
+    color: var(--ink); 
+    border:1px solid rgba(28,110,106,.2); 
+    padding:8px 12px; 
+    border-radius:14px; 
+    font-weight:700; 
+    box-shadow: var(--shadow); 
+    animation: pop .18s ease-out; 
+    pointer-events:none; 
+    z-index: 10;
+  }
+  .bubble::after{ 
+    content:""; position:absolute; width:10px; height:10px; 
+    background: var(--paper); 
+    border-left:1px solid rgba(28,110,106,.2); 
+    border-bottom:1px solid rgba(28,110,106,.2); 
+    transform: rotate(45deg); bottom:-5px; left:12px; 
+  }
+  @keyframes pop{ 
+    from{ transform: scale(.85); opacity:0 } 
+    to{ transform: scale(1); opacity:1 } 
+  }
 
-    .footer{ margin-top:18px; color:var(--muted); font-size:12px; text-align:center; }
+  .stack{
+    display:flex; 
+    flex-direction:column; 
+    gap:16px;
+    min-height:0; 
+    max-height: 600px;
+  }
 
-    .siren{
-      width:28px; height:18px;
-      border-radius:6px 6px 2px 2px;
-      background:linear-gradient(90deg, #ef4444 0 50%, #3b82f6 50% 100%);
-      box-shadow:0 0 12px rgba(239,68,68,.45), 0 0 12px rgba(59,130,246,.45);
-      opacity:0; transform: translateY(-6px);
-      transition: opacity .25s, transform .25s;
-    }
-    .siren.show{ opacity:1; transform: translateY(0); }
+  .dialog{ 
+    background: var(--card-bg); 
+    border: 1px solid rgba(28,110,106,.1); 
+    border-radius: var(--radius); 
+    padding:14px; 
+    display:flex; 
+    flex-direction:column; 
+    gap:10px;
+    height: 280px;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    box-shadow: var(--shadow);
+  }
 
-    .bell-stack{
-      display:flex; flex-direction:column; align-items:center; gap:8px;
+  @media (max-width: 859px){
+    .dialog {
+      height: 250px;
     }
-    .scene .siren{
-      position: static;
-      width: 54px; height: 18px; border-radius: 8px;
+    .stack{ 
+      overflow: visible; 
+      max-height: none;
     }
+  }
 
-    .waitwrap{
-      position:absolute;
-      left:50%;
-      bottom:12px;
-      transform:translateX(-50%);
-      width:min(520px, 86%);
-      pointer-events:auto;
-      display:none;
-    }
-    .waitwrap.show{ display:block; }
+  .dialog h3{ margin:0 0 2px 0; font-size:16px; letter-spacing:.2px; color: var(--ink); }
+  .options{ display:grid; gap:10px; }
+  .option{ 
+    width:100%; text-align:left; padding:12px 14px; 
+    background: var(--paper); 
+    color: var(--ink); 
+    border:1px solid rgba(28,110,106,.15); 
+    border-radius:12px; 
+    cursor:pointer; 
+    transition: transform .05s ease, border-color .2s, box-shadow .2s; 
+    box-shadow: 0 1px 3px rgba(0,0,0,.05);
+  }
+  .option:hover{ 
+    transform: translateY(-1px); 
+    border-color: var(--door-green); 
+    box-shadow: 0 4px 12px rgba(28,110,106,.15);
+  }
 
-    .waitbar{
-      height:12px;
-      border-radius:999px;
-      border:2px solid rgba(255,255,255,.4);
-      background: rgba(255,255,255,.2);
-      overflow:hidden;
-      box-shadow:
-        0 2px 10px rgba(0,0,0,.25) inset,
-        0 6px 14px rgba(0,0,0,.25);
-    }
+  .result{ display:none; gap:10px; align-items:center; }
+  .result.show{ display:flex; }
+  .badge{ 
+    font-weight:800; font-size:12px; padding:6px 10px; border-radius:999px; 
+    border:1px solid rgba(28,110,106,.2); 
+  }
+  .badge.success{ 
+    background: rgba(34,197,94,.1); 
+    color: var(--success); 
+    border-color: rgba(34,197,94,.3); 
+  }
+  .badge.fail{ 
+    background: rgba(239,68,68,.1); 
+    color: var(--danger); 
+    border-color: rgba(239,68,68,.3); 
+  }
+  .badge.warn{ 
+    background: rgba(245,158,11,.1); 
+    color: var(--warning); 
+    border-color: rgba(245,158,11,.3); 
+  }
 
-    .waitfill{
-      height:100%;
-      width:0%;
-      background: linear-gradient(90deg, #67e8f9 0%, var(--accent) 100%);
-      box-shadow:
-        0 0 14px rgba(6,182,212,.35) inset,
-        0 0 12px rgba(6,182,212,.25);
-      border-radius:999px;
-      transition: width .08s linear;
-    }
+  .stats-grid {
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap:12px;
+    margin:16px 0;
+  }
+  @media (max-width:640px){
+    .stats-grid { grid-template-columns: 1fr; }
+  }
+  .stat-box {
+    background: rgba(28,110,106,.05);
+    border:1px solid rgba(28,110,106,.15);
+    border-radius:12px;
+    padding:14px;
+    text-align:center;
+    box-shadow: 0 2px 8px rgba(0,0,0,.05);
+  }
+  .stat-value {
+    font-size:32px;
+    font-weight:800;
+    color: var(--door-green);
+    line-height:1;
+    margin-bottom:6px;
+  }
+  .stat-label {
+    font-size:12px;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:.5px;
+  }
+  .result-summary {
+    background: rgba(28,110,106,.03);
+    border: 1px solid rgba(28,110,106,.1);
+    border-radius:12px;
+    padding:16px;
+    text-align:center;
+    margin:16px 0;
+  }
+  .stat-actions {
+    display:flex;
+    gap:10px;
+    margin-top:14px;
+    flex-wrap:wrap;
+  }
+  #allTimeStats {
+    margin-top:20px;
+    padding-top:16px;
+    border-top:1px solid rgba(28,110,106,.1);
+  }
+  #allTimeStats h4 {
+    margin:0 0 12px;
+    font-size:14px;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:.5px;
+  }
+  #allTimeStats > div {
+    display:flex;
+    justify-content:space-between;
+    padding:8px 0;
+    border-bottom:1px solid rgba(28,110,106,.05);
+  }
 
-    .waitlabel{
-      margin-top:6px;
-      font-size:12px;
-      color:var(--muted);
-      text-align:center;
-      text-shadow: 0 1px 0 rgba(0,0,0,.4);
-    }
+  .footer{ margin-top:18px; color:var(--muted); font-size:12px; text-align:center; }
 
-    .pulse{ position:absolute; bottom:14px; right:14px; width:12px; height:12px; border-radius:50%; background: var(--accent); box-shadow:0 0 0 0 rgba(6,182,212,.6); animation: pulse 1.8s infinite; }
-    @keyframes pulse{ 0%{ box-shadow:0 0 0 0 rgba(6,182,212,.6)} 70%{ box-shadow:0 0 0 18px rgba(6,182,212,0)} 100%{ box-shadow:0 0 0 0 rgba(6,182,212,0)} }
+  .siren{
+    width:28px; height:18px;
+    border-radius:6px 6px 2px 2px;
+    background:linear-gradient(90deg, var(--danger) 0 50%, #3b82f6 50% 100%);
+    box-shadow:0 0 12px rgba(239,68,68,.3), 0 0 12px rgba(59,130,246,.3);
+    opacity:0; transform: translateY(-6px);
+    transition: opacity .25s, transform .25s;
+  }
+  .siren.show{ opacity:1; transform: translateY(0); }
 
-    @media (max-width: 640px) {
-      .scene{ min-height: 320px; }
-      .door-wrap { gap: 10px; }
-      .trust-indicator { width: 24px; padding: 8px 4px; gap: 6px; }
-      .trust-label { font-size: 8px; letter-spacing: .4px; }
-      .trust-meter { width: 10px; }
-      .trust-value { font-size: 10px; }
-      .trust-emoji { font-size: 14px; }
-      .doorbell { width: 42px; height: 100px; }
-      .ding { width: 26px; height: 26px; font-size: 14px; }
-      .doorbell .hint { font-size: 9px; bottom: 6px; }
-      .scene .siren { width: 42px; height: 16px; }
-      .door { max-width: calc(100% - 90px); }
-      .sign { font-size: 11px; padding: 6px 10px; top: 24px; }
-      .waitwrap { width: min(420px, 90%); bottom: 8px; }
-      .waitbar { height: 10px; }
-      .waitlabel { font-size: 11px; }
-    }
+  .bell-stack{
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+  }
+  .scene .siren{
+    position: static;
+    width: 54px; height: 18px; border-radius: 8px;
+  }
 
-    @media (max-width: 420px) {
-      .brand { flex-direction: column; align-items: flex-start; }
-      .brand .logo { width: 36px; height: 36px; }
-      .subtitle { font-size: 12px; }
-      .door-wrap { gap: 8px; inset: 10px; }
-      .trust-indicator { width: 20px; padding: 6px 3px; }
-      .trust-label { font-size: 7px; }
-      .trust-emoji { font-size: 12px; }
-      .doorbell { width: 36px; height: 90px; }
-      .ding { width: 22px; height: 22px; font-size: 12px; }
-      .scene .siren { width: 36px; height: 14px; }
-      .sign { font-size: 10px; padding: 5px 8px; }
-    }
-  </style>
+  .waitwrap{
+    position:absolute;
+    left:50%;
+    bottom:12px;
+    transform:translateX(-50%);
+    width:min(520px, 86%);
+    pointer-events:auto;
+    display:none;
+    text-align:center;
+    z-index: 10;
+  }
+  .waitwrap.show{ display:block; }
+
+  .spinner{
+    width:20px; height:20px;
+    border:3px solid rgba(28,110,106,.2);
+    border-top-color: var(--door-green);
+    border-radius:50%;
+    animation:spin 1s linear infinite;
+    margin:0 auto 8px;
+  }
+  @keyframes spin{
+    to{transform:rotate(360deg)}
+  }
+
+  .waitlabel{
+    font-size:12px;
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  /* Responsive Anpassungen */
+  @media (max-width: 640px) {
+    .scene{ min-height: 320px; }
+    .door-wrap { gap: 10px; }
+    .trust-indicator { width: 24px; padding: 8px 4px; gap: 6px; }
+    .trust-label { font-size: 8px; letter-spacing: .4px; }
+    .trust-meter { width: 10px; }
+    .trust-value { font-size: 10px; }
+    .trust-emoji { font-size: 14px; }
+    .doorbell { width: 42px; height: 100px; }
+    .ding { width: 26px; height: 26px; font-size: 14px; }
+    .doorbell .hint { font-size: 9px; bottom: 6px; }
+    .scene .siren { width: 42px; height: 16px; }
+    .door { max-width: calc(100% - 90px); }
+    .waitwrap { width: min(420px, 90%); bottom: 8px; }
+    .waitlabel { font-size: 11px; }
+    .spinner { width: 16px; height: 16px; border-width: 2px; }
+  }
+
+  @media (max-width: 420px) {
+    .brand { flex-direction: column; align-items: flex-start; }
+    .brand .logo { width: 36px; height: 36px; }
+    .subtitle { font-size: 12px; }
+    .door-wrap { gap: 8px; inset: 10px; }
+    .trust-indicator { width: 20px; padding: 6px 3px; }
+    .trust-label { font-size: 7px; }
+    .trust-emoji { font-size: 12px; }
+    .doorbell { width: 36px; height: 90px; }
+    .ding { width: 22px; height: 22px; font-size: 12px; }
+    .scene .siren { width: 36px; height: 14px; }
+  }
+</style>
 </head>
 <body>
 
@@ -422,9 +632,9 @@
 
             <div id="door" class="door closed" role="button" aria-label="Tür – tippen zum Klopfen">
               <div class="panel"></div>
-              <div class="sign">Vertreterbesuch unerwünscht</div>
-              <div class="knob"></div>
-              <div class="pulse" aria-hidden="true"></div>
+              <div class="cat-peek" id="catPeek">
+                <img src="/assets/katze.png" alt="Neugierige Katze" onerror="this.style.display='none'; this.parentElement.innerHTML='🐱';" />
+              </div>
             </div>
 
             <div class="bell-stack">
@@ -438,8 +648,6 @@
 
           <div class="ui">
             <div class="start-overlay" id="startOverlay">
-              <h2>Wähle deinen Schwierigkeitsgrad</h2>
-              <p style="margin-bottom:20px">Danach 2× klopfen/klingeln zum Start</p>
               <div class="difficulty-select">
                 <button class="difficulty-btn" data-difficulty="EASY">
                   <strong>🟢 Anfänger</strong>
@@ -456,9 +664,22 @@
               </div>
             </div>
 
+            <div class="success-overlay" id="successOverlay">
+              <h2>🎉 Auftrag abgeschlossen! 🎉</h2>
+            </div>
+
+            <div class="fail-overlay" id="failOverlay">
+              <h2>❌ Tür geschlossen! ❌</h2>
+            </div>
+
+            <div class="warn-overlay" id="warnOverlay">
+              <h2>⚠️ Eskalation! ⚠️</h2>
+              <div class="siren"></div>
+            </div>
+
             <div class="waitwrap" id="waitWrap" aria-live="polite">
-              <div class="waitbar"><div class="waitfill" id="waitFill"></div></div>
-              <div class="waitlabel" id="waitLabel">Kommt gleich … 3s</div>
+              <div class="spinner"></div>
+              <div class="waitlabel" id="waitLabel">Kunde sucht Unterlagen...</div>
             </div>
           </div>
         </div>
@@ -526,8 +747,11 @@
 <audio id="sfx-bell"        src="/assets/audio/dingdong2.mp3"   preload="auto"></audio>
 <audio id="sfx-dooropen"    src="/assets/audio/dooropen.mp3"    preload="auto"></audio>
 <audio id="sfx-doorclosed"  src="/assets/audio/doorclosed.mp3"  preload="auto"></audio>
+<audio id="sfx-doorsound"   src="/assets/audio/doorsound.mp3"   preload="auto"></audio>
 <audio id="sfx-police"      src="/assets/audio/police.mp3"      preload="auto"></audio>
 <audio id="sfx-success"     src="/assets/audio/success.mp3"     preload="auto"></audio>
+<audio id="sfx-cat"         src="/assets/audio/cat.mp3"         preload="auto"></audio>
+<audio id="sfx-ringtone"    src="/assets/audio/ringtone.mp3"    preload="auto"></audio>
 
   <script>
     const CONFIG = {
@@ -542,7 +766,7 @@
         label: "Anfänger",
         desc: "Kunde ist grundsätzlich offen. Perfekt zum Üben.",
         trustStart: 0,
-        maxKnocks: 3,
+        maxKnocks: 2,
         allowSecondChance: true
       },
       NORMAL: {
@@ -562,265 +786,839 @@
       }
     };
 
-    const DIALOG = {
-      start: "START",
-      states: { trust: 0, timePressure: 0, door: "closed" },
-      nodes: [
-        {
-          id: "START",
-          speaker: "customer",
-          text: "Hallo? Wer ist da?",
-          door: "closed",
-          options: [
-            { text: "Guten Tag, ich bin Daniel aus der Nachbarschaft. Kurzer Energie-Check – 60 Sekunden.", to: "WHY_ME", on: { "trust+": 1, "door": "ajar" } },
-            { text: "Einmal aufmachen, dauert nur ganz kurz.", ending: "warn", note: "Übergriffig, schlechter Start", on: { "trust-": 1 } },
-            { text: "(Visitenkarte zeigen) Ich helfe heute Haus für Haus beim Senken der Nebenkosten.", to: "WHY_ME", on: { "trust+": 1, "door": "ajar" } }
-          ]
+    // Fußmatten-Sprüche für EASY-Modus
+    const MAT_TEXTS = [
+      "Ob du wirklich richtig stehst, siehst du, wenn die Tür aufgeht.",
+      "Ich wusste, der Tag wird hässlich, aber mit dir habe ich nicht gerechnet.",
+      "Schuhe ausziehen oder Wohnung putzen.",
+      "Einbrechen lohnt sich hier nicht, versuch's beim Nachbarn.",
+      "Unfassbar, wie viele den Kopf drehen, nur um so einen Scheiß zu lesen."
+    ];
+
+    // Dialog-Bäume für alle 3 Modi
+    const DIALOG_TREES = {
+      EASY: {
+        start: "DOORMAT_EVENT",
+        nodes: [
+          // Fußmatten-Event (nur EASY)
+          {
+            id: "DOORMAT_EVENT",
+            speaker: "narrator",
+            text: "", // wird dynamisch gesetzt
+            door: "closed",
+            options: [
+              {
+                label: "witzig",
+                variants: [
+                  "(grinst) Na gut, dann fang ich eben krumm an.",
+                  "Haha, erwischt – mein Hals knackt schon.",
+                  "Okay Matte, 1:0 für dich."
+                ],
+                to: "START",
+                on: { "trust+": 2, door: "ajar" }
+              },
+              {
+                label: "ironisch",
+                variants: [
+                  "(ironisch) Keine Sorge, ich hab schon Nackenschmerzen genug.",
+                  "Genial, jetzt brauch ich 'ne Physiotherapie vorm Gespräch.",
+                  "Matte: Comedy Gold. Ich: Opfer."
+                ],
+                to: "START",
+                on: { "trust+": 1, door: "ajar" }
+              }
+            ]
+          },
+
+          // START
+          {
+            id: "START",
+            speaker: "customer",
+            text: "Hallo? Wer ist da?",
+            door: "ajar",
+            options: [
+              {
+                variants: [
+                  "Guten Tag, Firma XY. Kurzer Energie-Check für die Straße – 60 Sekunden, unverbindlich.",
+                  "Hallo! Ich mach heute schnelle Energie-Checks in der Straße. Dauert keine Minute.",
+                  "Guten Tag! Ich prüf grad für alle hier die Energiekosten. Ganz kurz nur."
+                ],
+                to: "WHY_EASY",
+                on: { "trust+": 2, door: "open" }
+              },
+              {
+                text: "Einmal aufmachen, dauert nur ganz kurz.",
+                ending: "fail",
+                note: "Übergriffig",
+                on: { "trust-": 2, door: "closed" }
+              },
+              {
+                text: "Ich bin von Ihrem Anbieter.",
+                ending: "warn",
+                note: "Lüge",
+                on: { "trust-": 3, door: "closed" }
+              }
+            ]
+          },
+
+          // WHY_EASY
+          {
+            id: "WHY_EASY",
+            speaker: "customer",
+            text: "Worum geht's denn genau?",
+            door: "open",
+            options: [
+              {
+                variants: [
+                  "Ich prüfe nur kurz Grund- und Arbeitspreis. Wenn's nichts bringt, bin ich gleich wieder weg.",
+                  "Nur die aktuellen Preise checken – falls da was zu holen ist, sag ich's Ihnen. Sonst nicht.",
+                  "Kurz Ihre Rechnung ansehen. Passt alles, bin ich wieder weg. Dauert 30 Sekunden."
+                ],
+                to: "DOCS_EASY",
+                on: { "trust+": 2 }
+              },
+              {
+                text: "Chef sagt, ich muss hier durch.",
+                ending: "fail",
+                note: "Unsympathisch",
+                on: { "trust-": 3, door: "closed" }
+              }
+            ]
+          },
+
+          // DOCS_EASY
+          {
+            id: "DOCS_EASY",
+            speaker: "customer",
+            text: "Unterlagen habe ich gerade nicht parat.",
+            door: "open",
+            options: [
+              {
+                variants: [
+                  "Kein Stress. Ein älteres Schreiben reicht – oben rechts stehen Anbieter und Preise.",
+                  "Völlig ok. Irgendeine alte Rechnung tut's auch – nur die Preise oben.",
+                  "Macht nichts. Auch 'ne alte Rechnung ist super, da stehen die Preise drauf."
+                ],
+                to: "READOUT_WAIT_EASY",
+                on: { "trust+": 2 }
+              },
+              {
+                text: "Dann holen Sie sie eben schnell.",
+                ending: "warn",
+                note: "Druck",
+                on: { "trust-": 2, door: "closed" }
+              },
+              {
+                text: "Gern auch später: 18:00 ein 5-Minuten-Check?",
+                ending: "success",
+                tag: "appointment",
+                note: "Termin vereinbart",
+                on: { "trust+": 3, door: "closed" }
+              }
+            ]
+          },
+
+          // READOUT_WAIT_EASY
+          {
+            id: "READOUT_WAIT_EASY",
+            speaker: "narrator",
+            text: "(Der Kunde kramt kurz…)",
+            door: "open",
+            options: [
+              {
+                text: "(Geduldig warten, freundlich lächeln)",
+                to: "CAT_DECISION",  // Hier kommt die Katzen-Entscheidung
+                on: { "trust+": 2 }
+              },
+              {
+                text: "(Nochmal klingeln/klopfen)",
+                ending: "warn",
+                note: "Ungeduld",
+                on: { "trust-": 2, door: "closed" }
+              }
+            ]
+          },
+
+          // Katzen-Weiche (70% Chance)
+          {
+            id: "CAT_DECISION",
+            speaker: "system",
+            text: "",
+            door: "open",
+            autoRoute: true, // Spezial-Flag für automatische Weiterleitung
+            options: []
+          },
+
+          // CAT_BOSS (70% Chance)
+          {
+            id: "CAT_BOSS",
+            speaker: "narrator",
+            text: "Eine Katze schiebt den Kopf durch den Türspalt und miaut fordernd.",
+            door: "open",
+            options: [
+              { 
+                variants: [
+                  "(schmunzelt) Einverstanden. Ich erkläre es der Chefin zuerst.",
+                  "(grinst) Klar, die Chefin entscheidet. Hallo erstmal!",
+                  "Ah, die eigentliche Entscheiderin. Guten Tag!"
+                ],
+                to: "READOUT_EASY", 
+                on: { "trust+": 2 } 
+              },
+              { 
+                text: "Könnten Sie die Katze bitte wegmachen?", 
+                to: "READOUT_EASY", 
+                on: { "trust-": 1 } 
+              }
+            ]
+          },
+
+          // READOUT_EASY
+          {
+            id: "READOUT_EASY",
+            speaker: "customer",
+            text: "Hier: Schauen Sie mal.",
+            door: "open",
+            options: [
+              {
+                variants: [
+                  "Danke. Bei ca. 3.200 kWh sparen Sie grob ~360 € pro Jahr. Ich zeig's Ihnen kurz.",
+                  "Perfekt. Das macht etwa 360 € Ersparnis im Jahr bei Ihrem Verbrauch. Kurz durchrechnen?",
+                  "Super. Bei Ihrem Verbrauch sind das locker 360 € jährlich weniger. Zeig ich Ihnen."
+                ],
+                to: "PRICE_EASY",
+                on: { "trust+": 2 }
+              },
+              {
+                text: "Ihr Anbieter ist Abzocke! Sofort kündigen!",
+                ending: "warn",
+                note: "Framing schlecht",
+                on: { "trust-": 2, door: "closed" }
+              }
+            ]
+          },
+
+          // PRICE_EASY
+          {
+            id: "PRICE_EASY",
+            speaker: "customer",
+            text: "Klingt gut. Wie geht's weiter?",
+            door: "open",
+            options: [
+              {
+                variants: [
+                  "In 30 Sekunden: Anmeldung, Kündigungsfristen, Abschlag anpassen – alles schriftlich. Ich bleibe Ansprechpartner.",
+                  "Ganz einfach: Anmeldung läuft automatisch, Sie bekommen alles schriftlich. Ich bin dann Ihr Kontakt.",
+                  "Easy: Anmelden, alter Vertrag wird gekündigt, neuer Abschlag. Alles in Papierform. Bei Fragen: ich."
+                ],
+                ending: "success",
+                note: "Klarer Ablauf",
+                on: { "trust+": 3, door: "closed" }
+              },
+              {
+                text: "Unterschreiben Sie hier sofort.",
+                ending: "warn",
+                note: "Drängeln",
+                on: { "trust-": 2, door: "closed" }
+              }
+            ]
+          }
+        ]
+      },
+
+      NORMAL: {
+  start: "START",
+  nodes: [
+    {
+      id: "START",
+      speaker: "customer",
+      text: "Hallo? Wer ist da?",
+      door: "closed",
+      options: [
+        { 
+          variants: [
+            "Guten Tag, Firma XY. Ich darf bei Ihnen auch nochmal einen Energie-Check durchführen. Haben Sie Interesse?",
+            "Guten Tag! Ich mache heute Energie-Checks in der Straße. Kurz Ihre Preise prüfen?",
+            "Hallo! Kurzer Check wegen der Energiepreise. Dauert keine Minute."
+          ],
+          to: "WHY_ME1", 
+          on: { "trust+": 1, door: "ajar" } 
         },
-        {
-          id: "AGGRESSIVE_START",
-          speaker: "customer",
-          text: "HIER STEHT KEINE VERTRETER! Können Sie nicht lesen?!",
-          door: "closed",
-          meta: { hardMode: true },
-          options: [
-            { text: "Entschuldigung, das habe ich übersehen. Ich gehe sofort.", ending: "neutral", note: "Respektvoller Rückzug", on: { "trust+": 1 } },
-            { text: "Ich bin kein Vertreter, sondern Energieberater.", ending: "fail", note: "Haarspalterei verärgert nur mehr" },
-            { text: "Das Schild gilt nicht für mich, ich bin vom Anbieter.", ending: "fail", note: "Lüge wird sofort durchschaut" }
-          ]
+        { 
+          text: "(Visitenkarte zeigen) Ich helfe heute Haus für Haus beim Senken der Nebenkosten.", 
+          to: "WHY_ME", 
+          on: { "trust+": 1, door: "ajar" } 
         },
-        {
-          id: "WHY_ME",
-          speaker: "customer",
-          text: "Warum ausgerechnet bei mir?",
-          door: "ajar",
-          options: [
-            { text: "Viele Verträge 2022/23 sind zu hoch. Ich prüfe fair & unverbindlich.", to: "ROLE_CHECK", on: { "trust+": 1 } },
-            { text: "Chef sagt, ich muss.", ending: "fail", note: "Unsympathisch" },
-            { text: "Wenn es nicht passt, bin ich in 20 Sekunden wieder weg. Versprochen.", to: "ROLE_CHECK", on: { "timePressure-": 1 } }
-          ]
+        { 
+          text: "Einmal aufmachen, dauert nur ganz kurz.", 
+          ending: "warn", 
+          note: "Übergriffig", 
+          on: { "trust-": 2 } 
         },
-        {
-          id: "ID_REQUEST",
-          speaker: "customer",
-          text: "Zeigen Sie mir erst mal Ihren Ausweis. Wir hatten hier schon Betrüger.",
-          door: "closed",
-          options: [
-            { text: "(Ausweis zeigen) Selbstverständlich. Hier, bitte sehr.", to: "WHY_ME", on: { "trust+": 2, "door": "ajar" } },
-            { text: "Das ist nicht nötig, vertrauen Sie mir einfach.", ending: "fail", note: "Verweigerung wirkt verdächtig" },
-            { text: "Ich habe keine Zeit für sowas. Machen Sie mit oder nicht?", ending: "warn", note: "Arroganz verschärft Misstrauen" }
-          ]
-        },
-        {
-          id: "ROLE_CHECK",
-          speaker: "customer",
-          text: "Sind Sie von meinem Anbieter?",
-          options: [
-            { text: "Nein. Ich vergleiche und erkläre, wann sich Wechsel oder Anpassungen lohnen.", to: "TENANT_OWNER" },
-            { text: "Mehr so… irgendwas dazwischen.", ending: "warn", note: "Unklarheit killt Vertrauen", on: { "trust-": 1 } }
-          ]
-        },
-        {
-          id: "TENANT_OWNER",
-          speaker: "customer",
-          text: "Ich bin Mieter. Bringt das überhaupt was?",
-          options: [
-            { text: "Ja. Arbeitspreis/Grundpreis sind privat relevant. Ein Blick auf die Abrechnung reicht.", to: "DOCS", on: { "trust+": 1 } },
-            { text: "Eigentümer-Thema. Dann nicht.", ending: "fail", note: "Falsche Einordnung" },
-            { text: "Als Eigentümer wäre PV spannend. Als Mieter checken wir den Stromtarif. 60 Sek.?", to: "DOCS" }
-          ]
-        },
-        {
-          id: "EXISTING_CUSTOMER",
-          speaker: "customer",
-          text: "Ich bin doch schon Kunde bei Ihnen seit 2 Jahren. Warum klingeln Sie dann?",
-          door: "ajar",
-          options: [
-            { text: "Perfekt! Dann schaue ich, ob Ihr Tarif noch aktuell ist. Haben Sie auch Gas?", to: "CROSS_SELL_GAS", on: { "trust+": 1 } },
-            { text: "Dann ist ja alles gut. Entschuldigung für die Störung.", ending: "neutral", note: "Verpasste Cross-Sell-Chance" },
-            { text: "Trotzdem sollten wir mal über Gas sprechen. Sie zahlen bestimmt zu viel.", to: "CROSS_SELL_GAS", on: { "trust+": 1 } }
-          ]
-        },
-        {
-          id: "CROSS_SELL_GAS",
-          speaker: "customer",
-          text: "Gas habe ich bei einem anderen Anbieter. Das läuft aber gut.",
-          options: [
-            { text: "Verstehe. Mit Kombi-Tarif könnten Sie nochmal 10-15% sparen. Rechnung zur Hand?", to: "READOUT", on: { "trust+": 1 } },
-            { text: "Dann lassen wir das. Danke für Ihre Zeit.", ending: "neutral", note: "Vorsichtig, aber Chance verpasst" }
-          ]
-        },
-        {
-          id: "DOCS",
-          speaker: "customer",
-          text: "Ich habe die Unterlagen gerade nicht hier.",
-          options: [
-            { text: "Kein Stress. Oben rechts stehen Anbieter, Grund- und Arbeitspreis. Reicht mir.", to: "DOCS_SEARCH", on: { "trust+": 1 } },
-            { text: "Dann holen Sie sie eben schnell.", ending: "fail", note: "Druck erzeugt Gegendruck", on: { "trust-": 2 } },
-            { text: "Ich blocke 18:00 für einen 5-Minuten-Check, passt das?", ending: "success", note: "Termin vereinbart" }
-          ]
-        },
-        {
-          id: "DOCS_SEARCH",
-          speaker: "narrator",
-          text: "Der Kunde kramt. Es dauert einen Moment.",
-          delayMs: 1200,
-          options: [
-            { text: "(Warten, freundlich lächeln, nicht klingeln/klopfen)", to: "READOUT", on: { "trust+": 1 } },
-            { text: "(Ungeduldig klingeln)", ending: "warn", note: "Eskalation durch Ungeduld" }
-          ]
-        },
-        {
-          id: "READOUT",
-          speaker: "customer",
-          text: "Hier: Grundpreis 13,90 €, Arbeitspreis 39,5 ct/kWh.",
-          options: [
-            { text: "Danke. Bei ~3.200 kWh sparen Sie ~360 €/Jahr. Ich zeige kurz die Alternative.", to: "PRICE_OBJECTION", on: { "trust+": 1 } },
-            { text: "Ihr Anbieter ist Abzocke! Sofort kündigen!", ending: "warn", note: "Panikmache schadet", on: { "trust-": 1 } }
-          ]
-        },
-        {
-          id: "PRICE_OBJECTION",
-          speaker: "customer",
-          text: "Das klingt teuer. Ich zahle aktuell 120€ im Monat.",
-          options: [
-            { text: "Verstehe. Bei 360€ Ersparnis pro Jahr würden Sie nur noch 90€/Monat zahlen. Rechnen wir durch?", to: "PRICE_BREAKDOWN", on: { "trust+": 2 } },
-            { text: "Das ist doch nicht teuer! Sie zahlen ja viel zu viel!", ending: "warn", note: "Defensiv und unsensibel" },
-            { text: "Ihr aktueller Anbieter zockt Sie ab. Die machen das mit allen so.", ending: "fail", note: "Panikmache wirkt unseriös" }
-          ]
-        },
-        {
-          id: "PRICE_BREAKDOWN",
-          speaker: "sales",
-          text: "Aktuell: 120€ × 12 = 1.440€/Jahr. Neu: 1.080€/Jahr. Ersparnis: 360€. Passt das?",
-          options: [
-            { text: "Klingt gut. Wie läuft der Wechsel ab?", to: "FAST_EXPLAIN" },
-            { text: "Aber bei Check24 habe ich 28€/Monat gesehen, das wären nur 92€.", to: "COMPETITOR_OFFER" }
-          ]
-        },
-        {
-          id: "COMPETITOR_OFFER",
-          speaker: "customer",
-          text: "Check24 hat mir 28€ weniger pro Monat angeboten. Das ist günstiger als Sie.",
-          options: [
-            { text: "Verstehe. Darf ich fragen: Preisgarantie wie lange? Oft nur 12 statt 24 Monate.", to: "COMPARE_OFFERS", on: { "trust+": 1 } },
-            { text: "Check24-Angebote sind Lockvogel-Tarife. Die taugen nichts.", ending: "warn", note: "Konkurrenz schlechtmachen wirkt unseriös" },
-            { text: "Dann nehmen Sie halt das Angebot. Viel Glück.", ending: "neutral", note: "Aufgegeben ohne Kampf" }
-          ]
-        },
-        {
-          id: "COMPARE_OFFERS",
-          speaker: "sales",
-          text: "Bei uns: 24 Monate Preisgarantie. Check24 oft nur 12, dann springt Preis hoch. Langfristig teurer.",
-          options: [
-            { text: "Ah, verstehe. Dann lieber Ihre Variante.", to: "FAST_EXPLAIN", on: { "trust+": 1 } },
-            { text: "Das glaube ich nicht. Zeigen Sie mir Beweise.", to: "PROOF_REQUEST" }
-          ]
-        },
-        {
-          id: "PROOF_REQUEST",
-          speaker: "customer",
-          text: "Ich will das schwarz auf weiß sehen. Sonst unterschreibe ich nichts.",
-          options: [
-            { text: "(Tablet/Dokument zeigen) Hier, bitte. Vertragsbedingungen im Detail.", to: "FAST_EXPLAIN", on: { "trust+": 2 } },
-            { text: "Sie müssen mir einfach vertrauen. Ich lüge nicht.", ending: "warn", note: "Verweigerung von Transparenz schadet" }
-          ]
-        },
-        {
-          id: "NEIGHBOR_WARNING",
-          speaker: "customer",
-          text: "Mein Nachbar hatte nach dem Wechsel nur Ärger. Service nicht erreichbar, Rechnungen falsch.",
-          options: [
-            { text: "Das tut mir leid für ihn. Bei uns: Direktkontakt zu mir, ich kümmere mich persönlich.", to: "FAST_EXPLAIN", on: { "trust+": 1 } },
-            { text: "Ihr Nachbar hat bestimmt selbst Fehler gemacht. Bei mir läuft alles glatt.", ending: "warn", note: "Nachbar schlechtmachen ist unsensibel" },
-            { text: "Solche Fälle kommen vor, aber das ist die Ausnahme. Kein Grund zur Sorge.", to: "FAST_EXPLAIN", on: { "timePressure-": 1 } }
-          ]
-        },
-        {
-          id: "NEIGHBOR_INTERFERENCE",
-          speaker: "narrator",
-          text: "Ein Nachbar ruft aus dem Flur: 'Die haben mich auch verarscht! Mach bloß nichts!'",
-          meta: { hardMode: true },
-          options: [
-            { text: "(Fokus auf Kunden) 'Lassen Sie uns in Ruhe besprechen. Jeder Fall ist anders.'", to: "NEIGHBOR_WARNING", on: { "trust+": 1 } },
-            { text: "(Zum Nachbarn) 'Das stimmt nicht! Sie verwechseln uns mit jemand anderem!'", ending: "warn", note: "Diskussion eskaliert" },
-            { text: "(Zum Nachbarn) 'Halten Sie sich da raus, das geht Sie nichts an!'", ending: "fail", note: "Beleidigung zerstört alles" }
-          ]
-        },
-        {
-          id: "STRESS_COMBO",
-          speaker: "customer",
-          text: "(Handy am Ohr, Kind schreit im Hintergrund) 'Ich habe gerade WIRKLICH keine Zeit!'",
-          door: "ajar",
-          meta: { hardMode: true },
-          options: [
-            { text: "Verstehe total. Darf ich morgen 18 Uhr nochmal vorbeikommen? 5 Minuten reichen.", ending: "success", note: "Empathie + Termin = Win", on: { "trust+": 2 } },
-            { text: "Das dauert nur 30 Sekunden, wirklich! Nur schnell unterschreiben.", ending: "warn", note: "Druck in Stresssituation = Katastrophe" },
-            { text: "(Warten, bis Kunde fertig telefoniert hat)", ending: "fail", note: "Zeitverschwendung, Kunde genervt" }
-          ]
-        },
-        {
-          id: "FAST_EXPLAIN",
-          speaker: "sales",
-          text: "Ablauf in 30 Sekunden: Anmeldung, Kündigungsfristen, Abschlag anpassen, Support bei Rückfragen.",
-          options: [
-            { text: "Klingt sinnvoll. Und wenn es Probleme gibt?", to: "STORNO_PREVENT" },
-            { text: "Keine Zeit heute.", to: "NO_TIME" }
-          ]
-        },
-        {
-          id: "STORNO_PREVENT",
-          speaker: "sales",
-          text: "Ich lasse Kontakt & Ablauf da. Bei Rückwerbung zuerst mich anrufen, nicht den Altanbieter.",
-          meta: { tags: ["Storno-Prävention","Schleife"] },
-          options: [
-            { text: "Okay, machen wir es kurz fertig.", to: "CLOSE_SETUP", on: { "door": "open", "trust+": 1 } },
-            { text: "Ich entscheide das nicht allein.", to: "PARTNER" }
-          ]
-        },
-        {
-          id: "PARTNER",
-          speaker: "customer",
-          text: "Ohne meinen Partner mache ich nichts.",
-          options: [
-            { text: "Völlig in Ordnung. Wir klären jetzt Eckdaten, entscheiden tun Sie zusammen. 2 Minuten.", to: "CLOSE_SETUP", on: { "trust+": 1 } },
-            { text: "Der Partner freut sich über 360 €/Jahr. Unterschreiben Sie einfach.", ending: "warn", note: "Druck, Risiko Storno" },
-            { text: "Dann lassen wir es.", ending: "neutral", note: "Abbruch ohne verbrannte Erde" }
-          ]
-        },
-        {
-          id: "NO_TIME",
-          speaker: "customer",
-          text: "Heute wirklich keine Zeit.",
-          options: [
-            { text: "Alles gut. Ich lege 18:30 an. 3 Minuten, nur Zahlen.", ending: "success", note: "Termin, respektvoll", on: { "timePressure-": 1 } },
-            { text: "Es dauert wirklich nur 30 Sekunden…", ending: "warn", note: "Bagatellisieren nervt" }
-          ]
-        },
-        {
-          id: "CLOSE_SETUP",
-          speaker: "sales",
-          text: "Ich trage Werte ein, passe Abschlag an und bestätige schriftlich. Danach jederzeit erreichbar.",
-          options: [
-            { text: "Alles klar. Los geht's.", ending: "success", note: "Abschluss" },
-            { text: "Ich will keine Werbung an der Tür.", to: "NO_SOLICITING" }
-          ]
-        },
-        {
-          id: "NO_SOLICITING",
-          speaker: "customer",
-          text: "Hier steht 'Keine Werbung/Vertreter unerwünscht'.",
-          options: [
-            { text: "Verstanden. Ich respektiere das. Karte liegt im Briefkasten.", ending: "neutral", note: "Sauberer Abgang" },
-            { text: "Das gilt nicht für mich.", ending: "fail", note: "Respektlos, rechtlich heikel" }
-          ]
+        { 
+          text: "Hallo, kennen Sie mich noch? Ich war mal da für Ihre Verträge.", 
+          ending: "fail", 
+          note: "Drücker-Masche", 
+          on: { "trust-": 3 } 
         }
-      ],
-      rules: {
-        escalation: [
-          { when: { pressedBellDuringDelay: true }, result: "warn", message: "Ungeduld triggert Eskalation." }
-        ],
-        score: { success: 2, warn: -1, fail: -2, neutral: 0 }
+      ]
+    },
+
+    // 20% Chance: Bestandskunden-Start
+    {
+      id: "EXISTING_CUSTOMER_START",
+      speaker: "customer",
+      text: "Moment... ich bin doch schon Kunde bei Ihnen seit 2 Jahren.",
+      door: "ajar",
+      options: [
+        { 
+          variants: [
+            "Perfekt! Dann prüfe ich, ob Ihr Tarif noch aktuell ist. Haben Sie auch Gas?",
+            "Super! Ich schaue mal, ob da noch was zu optimieren ist. Gas auch?",
+            "Klasse! Checken wir, ob Sie den besten Tarif haben. Nutzen Sie auch Gas?"
+          ],
+          to: "CROSS_SELL", 
+          on: { "trust+": 2, door: "open" } 
+        },
+        { 
+          text: "Oh, dann ist ja alles gut. Entschuldigung für die Störung.", 
+          ending: "neutral" 
+        },
+        { 
+          text: "Ja, aber wir haben neue Tarife. Unterschreiben Sie schnell.", 
+          ending: "fail", 
+          note: "Druck auf Bestandskunden", 
+          on: { "trust-": 3 } 
+        }
+      ]
+    },
+
+    {
+      id: "WHY_ME1",
+      speaker: "customer",
+      text: "Nein, ich brauch das nicht. Dankeschön.",
+      door: "ajar",
+      options: [
+        { 
+          text: "Auch nicht, wenn es sich für Sie lohnt? Sie könnten viel Geld sparen.", 
+          to: "NO_ANSWER", 
+          on: { "trust-": 1 } 
+        },
+        { 
+          variants: [
+            "Verstehe. Wenn es nicht passt, bin ich in 20 Sekunden wieder weg.",
+            "Klar. Falls nichts dabei ist, bin ich gleich wieder weg.",
+            "Alles gut. Passt's nicht, bin ich in 20 Sekunden weg."
+          ],
+          to: "ID_CHECK", 
+          on: { "trust+": 2, door: "open" } 
+        },
+        { 
+          text: "Klar brauchen Sie das. Jeder will Geld sparen!", 
+          ending: "fail", 
+          note: "Unsympathisch", 
+          on: { "trust-": 3 } 
+        }
+      ]
+    },
+
+    {
+      id: "WHY_ME",
+      speaker: "customer",
+      text: "Warum ausgerechnet bei mir?",
+      door: "ajar",
+      options: [
+        { 
+          variants: [
+            "Viele haben bereits eine Erhöhung erhalten. Ich prüfe fair & unverbindlich.",
+            "Die Preise sind 2024 gestiegen. Ich check das kostenlos für Sie.",
+            "Energiekosten explodieren. Ich prüf nur, ob Sie betroffen sind."
+          ],
+          to: "ID_CHECK", 
+          on: { "trust+": 2, door: "open" } 
+        },
+        { 
+          text: "Ich mache das hier in der ganzen Straße. Ist natürlich freiwillig.", 
+          to: "ID_CHECK", 
+          on: { "trust+": 1, door: "open" } 
+        },
+        { 
+          text: "Ich wurde extra für Sie vorbeigeschickt. Haben Sie ein Stück Tisch frei?", 
+          ending: "fail", 
+          note: "Lüge/Drücker", 
+          on: { "trust-": 3 } 
+        }
+      ]
+    },
+
+    {
+      id: "NO_ANSWER",
+      speaker: "customer",
+      text: "Ich sagte Nein, danke!",
+      door: "ajar",
+      options: [
+        { 
+          text: "Ach kommen Sie schon. Geben Sie sich einen Ruck.", 
+          ending: "fail", 
+          note: "Was verstehen Sie nicht an NEIN?!", 
+          on: { "trust-": 3 } 
+        },
+        { 
+          variants: [
+            "Ok, kein Problem. Dann wünsche ich Ihnen noch einen angenehmen Tag.",
+            "Alles klar, verstehe. Schönen Tag noch!",
+            "Passt. Danke für Ihre Zeit. Schönen Tag!"
+          ],
+          ending: "neutral" 
+        },
+        { 
+          text: "Sind Sie auch Kunde bei XY? Dann ist es wie bei vielen Nachbarn. Vermutlich XY-Preis. Holen Sie ein Schreiben, dann zeige ich Ihnen, was das heißt.", 
+          to: "DOCS", 
+          on: { "trust+": 2, door: "open" } 
+        }
+      ]
+    },
+
+    {
+      id: "ID_CHECK",
+      speaker: "customer",
+      text: "Moment, zeigen Sie mir erst mal Ihren Ausweis. Wir hatten hier schon Betrüger.",
+      door: "open",
+      options: [
+        { 
+          variants: [
+            "(Ausweis zeigen) Selbstverständlich. Hier, bitte sehr.",
+            "(Ausweis zeigen) Klar, gern. Hier.",
+            "(Ausweis zeigen) Natürlich. Bitteschön."
+          ],
+          to: "ROLE_CHECK", 
+          on: { "trust+": 3 } 
+        },
+        { 
+          text: "Das ist nicht nötig, vertrauen Sie mir einfach.", 
+          ending: "fail", 
+          note: "Verweigerung wirkt verdächtig", 
+          on: { "trust-": 3 } 
+        },
+        { 
+          text: "Ich habe keine Zeit für sowas. Machen Sie mit oder nicht?", 
+          ending: "warn", 
+          note: "Arroganz verschärft Misstrauen", 
+          on: { "trust-": 2 } 
+        }
+      ]
+    },
+
+    {
+      id: "ROLE_CHECK",
+      speaker: "customer",
+      text: "Sind Sie von meinem Anbieter?",
+      options: [
+        { 
+          variants: [
+            "Nein. Ich vergleiche und erkläre, wann sich Wechsel oder Anpassungen lohnen.",
+            "Nein, ich bin unabhängig. Ich zeig Ihnen nur, wo Sie sparen können.",
+            "Nein. Ich vergleiche Tarife – neutral und kostenlos."
+          ],
+          to: "TENANT_OWNER", 
+          on: { "trust+": 2 } 
+        },
+        { 
+          text: "Mehr so… irgendwas dazwischen.", 
+          ending: "warn", 
+          note: "Unklar", 
+          on: { "trust-": 1 } 
+        },
+        { 
+          text: "Ja klar!", 
+          ending: "fail", 
+          note: "Lüge", 
+          on: { "trust-": 3 } 
+        }
+      ]
+    },
+
+    {
+      id: "TENANT_OWNER",
+      speaker: "customer",
+      text: "Ich bin Mieter. Bringt das überhaupt was?",
+      options: [
+        { 
+          variants: [
+            "Ja. Arbeitspreis und Grundpreis betreffen auch Mieter. Ein Blick auf die Abrechnung reicht.",
+            "Klar! Mieter zahlen Strom selbst. Ein Blick auf die Rechnung genügt.",
+            "Ja, als Mieter erst recht. Ihre Stromkosten bestimmen Sie. Kurz die Rechnung?"
+          ],
+          to: "SETTLING_IN", 
+          on: { "trust+": 2 } 
+        },
+        { 
+          text: "Als Eigentümer wäre PV spannend. Als Mieter checken wir den Stromtarif. 60 Sek.?", 
+          to: "SETTLING_IN" 
+        },
+        { 
+          text: "Dann nicht.", 
+          ending: "fail" 
+        }
+      ]
+    },
+
+    {
+      id: "SETTLING_IN",
+      speaker: "customer",
+      text: "Kommen Sie rein. Setzen Sie sich. Möchten Sie was trinken?",
+      door: "open",
+      options: [
+        { 
+          variants: [
+            "Gern ein Glas Wasser, danke. Wo kann ich mich hinsetzen?",
+            "Ein Wasser wäre super, danke. Darf ich hier Platz nehmen?",
+            "Danke, gern. Wo darf ich mich hinsetzen?"
+          ],
+          to: "DOCS", 
+          on: { "trust+": 2 } 
+        },
+        { 
+          text: "Nein danke, muss schnell gehen. Wo sind Ihre Unterlagen?", 
+          to: "DOCS", 
+          on: { "trust-": 1 } 
+        },
+        { 
+          text: "Ich bleibe stehen, dauert ja nicht lange.", 
+          to: "DOCS" 
+        }
+      ]
+    },
+
+    {
+      id: "CROSS_SELL",
+      speaker: "customer",
+      text: "Gas habe ich bei einem anderen Anbieter. Läuft aber gut.",
+      door: "open",
+      options: [
+        { 
+          variants: [
+            "Verstehe. Mit Kombi-Tarif könnten Sie nochmal 10-15% sparen. Rechnung zur Hand?",
+            "Ok. Kombi ist oft günstiger. Haben Sie die Gas-Rechnung da?",
+            "Verstehe. Zusammen spart man meist mehr. Rechnung griffbereit?"
+          ],
+          to: "DOCS", 
+          on: { "trust+": 2 } 
+        },
+        { 
+          text: "Dann lassen wir das. Danke für Ihre Zeit.", 
+          ending: "neutral" 
+        }
+      ]
+    },
+
+    {
+      id: "DOCS",
+      speaker: "customer",
+      text: "Ich habe die Unterlagen gerade nicht hier.",
+      door: "open",
+      options: [
+        { 
+          variants: [
+            "Kein Stress. Ein älteres Schreiben reicht auch. Oben rechts stehen Anbieter und Preise.",
+            "Kein Problem. Auch ein altes tut's. Da stehen die Preise drauf.",
+            "Macht nichts. Selbst ein altes Schreiben reicht – die Preise stehen oben."
+          ],
+          to: "READOUT_WAIT", 
+          on: { "trust+": 2 } 
+        },
+        { 
+          text: "Ich blocke 18:00 für einen 5-Minuten-Check. Passt das?", 
+          ending: "success", 
+          tag: "appointment",
+          note: "Termin vereinbart", 
+          on: { "trust+": 3 } 
+        },
+        { 
+          text: "Dann holen Sie sie eben schnell.", 
+          ending: "fail", 
+          note: "Druck", 
+          on: { "trust-": 3 } 
+        }
+      ]
+    },
+
+    {
+      id: "READOUT_WAIT",
+      speaker: "narrator",
+      text: "(Der Kunde kramt kurz…)",
+      door: "open",
+      options: [
+        { 
+          text: "(Geduldig warten, freundlich lächeln)", 
+          to: "PHONE_DECISION",  // Weiche zu Phone-Event
+          on: { "trust+": 2 } 
+        },
+        { 
+          text: "(Nochmal klingeln/klopfen)", 
+          ending: "warn", 
+          note: "Ungeduld", 
+          on: { "trust-": 2 } 
+        }
+      ]
+    },
+
+    // Phone-Weiche (50% Chance)
+    {
+      id: "PHONE_DECISION",
+      speaker: "system",
+      text: "",
+      door: "open",
+      autoRoute: true,
+      options: []
+    },
+
+    {
+      id: "PHONE_INTERRUPTION",
+      speaker: "narrator",
+      text: "Das Handy des Kunden klingelt. Er schaut aufs Display.\nKunde: 'Sorry, muss ich kurz rangehen. Moment.'",
+      door: "open",
+      options: [
+        { 
+          variants: [
+            "(Nickt) Kein Problem, lassen Sie sich Zeit.",
+            "(Lächelt) Alles gut, gehen Sie ran.",
+            "Klar, kein Stress."
+          ],
+          to: "READOUT", 
+          on: { "trust+": 2 } 
+        },
+        { 
+          text: "(Genervt seufzen und auf die Uhr schauen)", 
+          ending: "warn", 
+          note: "Ungeduldig", 
+          on: { "trust-": 2 } 
+        }
+      ]
+    },
+
+    {
+      id: "READOUT",
+      speaker: "customer",
+      text: "Hier: Grundpreis 13,90 €, Arbeitspreis 39,5 ct/kWh.",
+      door: "open",
+      options: [
+        { 
+          variants: [
+            "Danke. Bei ca. 3.200 kWh sparen Sie grob ~360 € pro Jahr. Ich zeige kurz die Alternative.",
+            "Perfekt. Das sind etwa 360 € Ersparnis im Jahr. Kurz durchrechnen?",
+            "Super. Bei Ihrem Verbrauch locker 360 € weniger pro Jahr. Zeig ich Ihnen."
+          ],
+          to: "NEIGHBOR_DECISION", 
+          on: { "trust+": 2 } 
+        },
+        { 
+          text: "Ihr Anbieter ist Abzocke! Sofort kündigen!", 
+          ending: "warn", 
+          note: "Framing schlecht", 
+          on: { "trust-": 2 } 
+        }
+      ]
+    },
+
+    // Nachbar-Weiche (40% Chance)
+    {
+      id: "NEIGHBOR_DECISION",
+      speaker: "system",
+      text: "",
+      door: "open",
+      autoRoute: true,
+      options: []
+    },
+
+    {
+      id: "NEIGHBOR_CURIOUS",
+      speaker: "narrator",
+      text: "Die Nachbarin von nebenan steckt neugierig den Kopf rein.\nNachbarin: 'Was macht der denn hier? Alles okay bei dir?'",
+      door: "open",
+      options: [
+        { 
+          variants: [
+            "(Freundlich zur Nachbarin) Guten Tag! Ich erkläre gerade Energiepreise. Interesse?",
+            "(Lächelt zur Nachbarin) Hallo! Nur ein Preis-Check. Wollen Sie auch?",
+            "(Winkt zur Nachbarin) Tag! Strompreise. Soll ich bei Ihnen auch?"
+          ],
+          to: "PRICE_OBJECTION", 
+          on: { "trust+": 2 } 
+        },
+        { 
+          text: "(Ignoriert Nachbarin, spricht weiter mit Kunde)", 
+          to: "PRICE_OBJECTION", 
+          on: { "trust-": 1 } 
+        },
+        { 
+          text: "(Genervt) Könnten wir das bitte unter vier Augen klären?", 
+          ending: "warn", 
+          note: "Nachbarin fühlt sich angegriffen", 
+          on: { "trust-": 2 } 
+        }
+      ]
+    },
+
+    {
+      id: "PRICE_OBJECTION",
+      speaker: "customer",
+      text: "Das klingt teuer. Ich zahle aktuell 120 € im Monat.",
+      door: "open",
+      options: [
+        { 
+          variants: [
+            "Verstehe. Neu wären etwa 90 €/Monat. Wollen wir das kurz sauber durchrechnen?",
+            "Ok. Neu: 90 € statt 120 €. Rechnen wir das mal durch?",
+            "Verstehe. Mit dem neuen Tarif nur noch 90 €. Kurz die Rechnung?"
+          ],
+          to: "PARTNER_JOINS", 
+          on: { "trust+": 3 } 
+        },
+        { 
+          text: "Das ist doch nicht teuer! Sie zahlen viel zu viel!", 
+          ending: "warn", 
+          note: "Unsensibel", 
+          on: { "trust-": 2 } 
+        }
+      ]
+    },
+
+    {
+      id: "PARTNER_JOINS",
+      speaker: "narrator",
+      text: "Die Wohnungstür geht auf. Der Partner des Kunden kommt nach Hause.\nPartner: 'Was ist denn hier los? Wer sind Sie?'",
+      door: "open",
+      options: [
+        { 
+          variants: [
+            "(Freundlich) Guten Tag! Ich erkläre gerade Energiepreise. Perfekt, dass Sie da sind – dann können Sie direkt mit entscheiden.",
+            "(Lächelt) Hallo! Stromkosten-Check. Gut, dass Sie da sind – so hören Sie's auch.",
+            "Guten Tag! Energie-Vergleich. Super Timing – jetzt können Sie mitentscheiden."
+          ],
+          to: "FAST_EXPLAIN_BOTH", 
+          on: { "trust+": 3 } 
+        },
+        { 
+          text: "(Zum Kunden) Unterschreiben Sie schnell, bevor er nein sagt.", 
+          ending: "fail", 
+          note: "Manipulation", 
+          on: { "trust-": 3 } 
+        },
+        { 
+          text: "(Zum Partner) Ihr Partner spart 360 € im Jahr. Wollen Sie das verhindern?", 
+          ending: "warn", 
+          note: "Passiv-aggressiv", 
+          on: { "trust-": 2 } 
+        }
+      ]
+    },
+
+    {
+      id: "FAST_EXPLAIN_BOTH",
+      speaker: "sales",
+      text: "Ablauf in 30 Sekunden: Anmeldung, Kündigungsfristen, Abschlag anpassen, alles schriftlich. Ich bleibe Ihr Ansprechpartner.\n\nPartner (zum Kunden): 'Was meinst du?'",
+      door: "open",
+      options: [
+        { 
+          text: "Kunde: 'Klingt gut. Machen wir.'", 
+          ending: "success", 
+          note: "Beide überzeugt", 
+          on: { "trust+": 3 } 
+        },
+        { 
+          text: "Kunde: 'Lass uns drüber schlafen.' → Spieler: 'Verstehe. Ich komme morgen 18:00 nochmal vorbei. 3 Minuten.'", 
+          ending: "success",
+          tag: "appointment",
+          note: "Termin vereinbart", 
+          on: { "trust+": 2 } 
+        },
+        { 
+          text: "Kunde: 'Lass uns drüber schlafen.' → Spieler: 'Wenn Sie jetzt nicht unterschreiben, ist das Angebot weg.'", 
+          ending: "warn", 
+          note: "Druckmasche", 
+          on: { "trust-": 3 } 
+        },
+        { 
+          text: "Partner: 'Wir brauchen das nicht.' → Spieler: 'Alles klar, verstehe. Hier meine Karte, falls Sie es sich anders überlegen.'", 
+          ending: "neutral" 
+        },
+        { 
+          text: "Partner: 'Wir brauchen das nicht.' → Spieler: 'Sie verschenken gerade 360 € pro Jahr.'", 
+          ending: "warn", 
+          note: "Aufdringlich", 
+          on: { "trust-": 2 } 
+        }
+      ]
+    }
+  ]
+},
+
+      HARD: {
+        start: "START", // oder "AGGRESSIVE_START" bei Escalation
+        nodes: [
+          {
+            id: "AGGRESSIVE_START",
+            speaker: "customer",
+            text: "HIER STEHT KEINE VERTRETER! Können Sie nicht lesen?!",
+            door: "closed",
+            options: [
+              { text: "Entschuldigung, das habe ich übersehen. Ich gehe sofort.", ending: "neutral", note: "Respektvoller Rückzug", on: { "trust+": 1 } },
+              { text: "Ich bin kein Vertreter, sondern Energieberater.", ending: "fail", note: "Haarspalterei verärgert nur mehr" },
+              { text: "Das Schild gilt nicht für mich, ich bin vom Anbieter.", ending: "fail", note: "Lüge wird sofort durchschaut" }
+            ]
+          },
+          {
+            id: "START",
+            speaker: "customer",
+            text: "Hallo? Wer ist da?",
+            door: "closed",
+            options: [
+              { text: "Guten Tag, ich bin Daniel aus der Nachbarschaft. Kurzer Energie-Check – 60 Sekunden.", to: "WHY_ME", on: { "trust+": 1, door: "ajar" } },
+              { text: "Einmal aufmachen, dauert nur ganz kurz.", ending: "warn", note: "Übergriffig", on: { "trust-": 1 } }
+            ]
+          },
+          {
+            id: "WHY_ME",
+            speaker: "customer",
+            text: "Warum ausgerechnet bei mir?",
+            door: "ajar",
+            options: [
+              { text: "Viele Verträge 2022/23 sind zu hoch. Ich prüfe fair & unverbindlich.", to: "NEIGHBOR_INTERFERENCE", on: { "trust+": 1 } },
+              { text: "Chef sagt, ich muss.", ending: "fail", note: "Unsympathisch" }
+            ]
+          },
+          {
+            id: "NEIGHBOR_INTERFERENCE",
+            speaker: "narrator",
+            text: "Ein Nachbar ruft aus dem Flur: 'Die haben mich auch verarscht! Mach bloß nichts!'",
+            options: [
+              { text: "(Fokus auf Kunden) 'Lassen Sie uns in Ruhe besprechen. Jeder Fall ist anders.'", to: "ROLE_CHECK", on: { "trust+": 1 } },
+              { text: "(Zum Nachbarn) 'Das stimmt nicht! Sie verwechseln uns mit jemand anderem!'", ending: "warn", note: "Diskussion eskaliert" },
+              { text: "(Zum Nachbarn) 'Halten Sie sich da raus, das geht Sie nichts an!'", ending: "fail", note: "Beleidigung zerstört alles" }
+            ]
+          },
+          {
+            id: "ROLE_CHECK",
+            speaker: "customer",
+            text: "Sind Sie von meinem Anbieter?",
+            options: [
+              { text: "Nein. Ich vergleiche und erkläre, wann sich Wechsel oder Anpassungen lohnen.", to: "STRESS_COMBO" },
+              { text: "Mehr so… irgendwas dazwischen.", ending: "warn", note: "Unklarheit", on: { "trust-": 1 } }
+            ]
+          },
+          {
+            id: "STRESS_COMBO",
+            speaker: "customer",
+            text: "(Handy am Ohr, Kind schreit im Hintergrund) 'Ich habe gerade WIRKLICH keine Zeit!'",
+            door: "ajar",
+            options: [
+              { text: "Verstehe total. Darf ich morgen 18 Uhr nochmal vorbeikommen? 5 Minuten reichen.", ending: "success", note: "Empathie + Termin = Win", on: { "trust+": 2 } },
+              { text: "Das dauert nur 30 Sekunden, wirklich! Nur schnell unterschreiben.", ending: "warn", note: "Druck in Stresssituation = Katastrophe" },
+              { text: "(Warten, bis Kunde fertig telefoniert hat)", ending: "fail", note: "Zeitverschwendung, Kunde genervt" }
+            ]
+          }
+        ]
       }
     };
 
@@ -848,28 +1646,51 @@
     const resetBtn = document.getElementById('resetBtn');
     const playAgain = document.getElementById('playAgain');
     const waitWrap = document.getElementById('waitWrap');
-    const waitFill = document.getElementById('waitFill');
     const waitLabel = document.getElementById('waitLabel');
+    const successOverlay = document.getElementById('successOverlay');
+    const failOverlay = document.getElementById('failOverlay');
+    const warnOverlay = document.getElementById('warnOverlay');
+    const catPeek = document.getElementById('catPeek');
 
 const sfx = {
   knock:      document.getElementById('sfx-knock'),
   bell:       document.getElementById('sfx-bell'),
   dooropen:   document.getElementById('sfx-dooropen'),
   doorclosed: document.getElementById('sfx-doorclosed'),
+  doorsound:  document.getElementById('sfx-doorsound'),  // NEU
   police:     document.getElementById('sfx-police'),
   success:    document.getElementById('sfx-success'),
+  cat:        document.getElementById('sfx-cat'),
+  ringtone:   document.getElementById('sfx-ringtone'),
 };
-    
-    function playSfx(name, vol = 1){
-      const el = sfx[name]; 
-      if(!el || !el.src || el.error) return;
-      try{ 
-        el.pause(); 
-        el.currentTime = 0; 
-        el.volume = vol; 
-        el.play().catch(()=>{}); 
-      } catch(e) {}
+let audioUnlocked = false;
+
+function unlockAudio() {
+  if(audioUnlocked) return;
+  // Einfaches Audio-Unlock für alle Browser (stumm)
+  Object.values(sfx).forEach(audio => {
+    if(audio && audio.src) {
+      audio.load();
+      audio.volume = 0; // Stumm schalten
+      audio.play().then(() => {
+        audio.pause();
+        audio.volume = 1; // Lautstärke wieder normal
+      }).catch(() => {});
     }
+  });
+  audioUnlocked = true;
+}
+
+function playSfx(name, vol = 1){
+  const original = sfx[name]; 
+  if(!original || !original.src) return;
+  
+  // Audio clonen statt currentTime = 0 (viel schneller!)
+  const audio = original.cloneNode();
+  audio.volume = vol;
+  audio.play().catch(() => {});
+}
+
     
     function knockSound(){ playSfx('knock', 0.9); }
     function bellSound(){  playSfx('bell',  0.9); }
@@ -886,35 +1707,55 @@ const sfx = {
     let lastKnockAt = 0;
     let waitingMode = null;
     let openTimerId = null;
-    let rafId = null;
-    let waitStartTs = null;
+    let flavorShown = false; // Für einmalige Events wie Katze
+    let persistentKnocks = 0; // Zähler für Joke-System (wird nie zurückgesetzt)
 
-    const state = { ...DIALOG.states };
+    const state = { trust: 0, door: "closed", timePressure: 0 };
     let currentNode = null;
+    let currentTree = null;
 
     function srSpeak(text){ customerLine.textContent = text; }
-function openDoor(){ 
-  door.classList.add('open'); 
-  door.classList.remove('closed'); 
-  playSfx('dooropen', 0.8);
+    
+function setDoor(status){
+  const currentStatus = state.door;
+  
+  if(currentStatus === status) {
+    return; // Keine Änderung, kein Sound
+  }
+  
+  door.classList.remove('closed', 'ajar', 'open');
+  door.classList.add(status);
+  state.door = status;
+  
+  // Sound-Logik
+  if(currentStatus === 'closed' && status === 'ajar') {
+    playSfx('dooropen', 0.8);   // closed → ajar
+  } else if(currentStatus === 'ajar' && status === 'open') {
+    playSfx('doorsound', 0.8);  // ajar → open
+  } else if(currentStatus === 'closed' && status === 'open') {
+    playSfx('dooropen', 0.8);   // closed → open (direkt)
+  } else if(status === 'closed') {
+    playSfx('doorclosed', 0.7); // ??? → closed
+  }
 }
 
-function closeDoor(){ 
-  door.classList.add('closed'); 
-  door.classList.remove('open'); 
-  playSfx('doorclosed', 0.7);
-}
+function openDoor(){ setDoor('open'); }
+function closeDoor(){ setDoor('closed'); }
+function ajarDoor(){ setDoor('ajar'); }
 
-    function showBubble(text, clientX=null, clientY=null){
-      const wrapRect = door.parentElement.getBoundingClientRect();
-      const rect = door.getBoundingClientRect();
-      let x = clientX != null ? Math.min(rect.right - 20, Math.max(rect.left + 20, clientX)) : (rect.left + rect.width * 0.25);
-      let y = clientY != null ? Math.min(rect.bottom - 60, Math.max(rect.top + 20, clientY)) : (rect.top + rect.height * 0.25);
-      const b = document.createElement('div'); b.className = 'bubble'; b.textContent = text;
-      b.style.left = (x - wrapRect.left - 30) + 'px';
-      b.style.top  = (y - wrapRect.top  - 40) + 'px';
-      door.parentElement.appendChild(b); setTimeout(()=> b.remove(), 1200);
-    }
+function showBubble(text, clientX=null, clientY=null, duration=1200){
+  const wrapRect = door.parentElement.getBoundingClientRect();
+  const rect = door.getBoundingClientRect();
+  let x = clientX != null ? Math.min(rect.right - 20, Math.max(rect.left + 20, clientX)) : (rect.left + rect.width * 0.25);
+  let y = clientY != null ? Math.min(rect.bottom - 60, Math.max(rect.top + 20, clientY)) : (rect.top + rect.height * 0.25);
+  const b = document.createElement('div'); 
+  b.className = 'bubble'; 
+  b.textContent = text;
+  b.style.left = (x - wrapRect.left - 30) + 'px';
+  b.style.top  = (y - wrapRect.top  - 40) + 'px';
+  door.parentElement.appendChild(b); 
+  setTimeout(()=> b.remove(), duration);  // ← Jetzt mit duration Parameter
+}
 
     function revealCTA(){ 
       ctaPrimary.setAttribute('href', CONFIG.courseUrl); 
@@ -928,11 +1769,14 @@ function closeDoor(){
       resultBadge.textContent = type === 'success' ? 'Tür geht auf' : type === 'warn' ? 'Eskalation' : 'Tür zu';
     }
 
+    function showStaticWait(text){
+      waitWrap.classList.add('show');
+      waitLabel.textContent = text;
+    }
+
     function hideWait(){
       waitWrap.classList.remove('show');
-      waitFill.style.width = '0%';
       waitLabel.textContent = '';
-      if(rafId){ cancelAnimationFrame(rafId); rafId = null; }
     }
 
     function softResetUI(){
@@ -942,12 +1786,14 @@ function closeDoor(){
       ctaCard.style.display = 'none'; 
       statsCard.style.display = 'none';
       siren.classList.remove('show'); 
+      catPeek.classList.remove('show'); 
       resetBtn.style.display = 'none';
       closeDoor(); 
       srSpeak(difficultySelected ? 'Klopfe oder klingel zwei Mal …' : 'Wähle Schwierigkeitsgrad, dann 2× klopfen …');
     }
 
     function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+    
     function trustPercent(t){
       const p = Math.round(((clamp(t, -2, 4) - (-2)) / (4 - (-2))) * 100);
       return clamp(p, 0, 100);
@@ -974,60 +1820,55 @@ function closeDoor(){
       knocksTotal = 0; 
       lastKnockAt = 0; 
       waitingMode = null;
+      flavorShown = false;
+      persistentKnocks = 0; // Nur bei Hard-Reset zurücksetzen
       if(openTimerId){ clearTimeout(openTimerId); openTimerId = null; }
-      Object.assign(state, DIALOG.states);
+      state.trust = 0;
+      state.door = "closed";
+      state.timePressure = 0;
       currentNode = null;
+      currentTree = null;
       gameStats = { startTime: null, endTime: null, choicesMade: 0, finalTrust: 0, difficulty: 'EASY', outcome: null };
       softResetUI(); 
       startOverlay.style.display = 'flex'; 
-      document.querySelector('.pulse').style.display = 'block';
       updateTrustDisplay();
     }
 
-    function getNode(id){ return DIALOG.nodes.find(n => n.id === id); }
-
-    function applyDoorFromNode(node){
-      const d = node.door || state.door;
-      if(d === 'open'){ openDoor(); } else { closeDoor(); }
-      state.door = d;
+    function getNode(id){ 
+      if(!currentTree) return null;
+      return currentTree.nodes.find(n => n.id === id); 
     }
 
-    function animateWait(totalMs, label='Kommt gleich …'){
-      waitWrap.classList.add('show');
-      waitStartTs = performance.now();
-      function step(ts){
-        const elapsed = ts - waitStartTs;
-        const p = Math.min(1, elapsed / totalMs);
-        waitFill.style.width = (p * 100).toFixed(1) + '%';
-        const remain = Math.max(0, Math.ceil((totalMs - elapsed)/1000));
-        waitLabel.textContent = remain > 0 ? `${label} ${remain}s` : 'Öffnet…';
-        if(p < 1 && waitingMode){ rafId = requestAnimationFrame(step); } else { hideWait(); }
-      }
-      rafId = requestAnimationFrame(step);
-    }
-
-    function statePasses(requireObj = {}){
-      if(requireObj.door){
-        const allowed = Array.isArray(requireObj.door) ? requireObj.door : [requireObj.door];
-        if(!allowed.includes(state.door)) return false;
-      }
-      for(const k of Object.keys(requireObj)){
-        if(k.endsWith(">=")){
-          const key = k.replace(">=","");
-          if((state[key] ?? 0) < requireObj[k]) return false;
-        }
-      }
-      return true;
-    }
+function applyDoorFromNode(node){
+  const d = node.door || state.door;
+  setDoor(d);
+}
 
     function applyOn(on = {}){
       for(const [k,v] of Object.entries(on)){
         if(k.endsWith("+")){ const key = k.replace("+",""); state[key] = (state[key]||0) + v; }
         else if(k.endsWith("-")){ const key = k.replace("-",""); state[key] = (state[key]||0) - v; }
-        else if(k === "door"){ state.door = v; if(v === "open") openDoor(); else closeDoor(); }
+        else if(k === "door"){ setDoor(v); }
         else { state[k] = v; }
       }
       updateTrustDisplay();
+    }
+
+    // Variants-System: wählt zufällig einen Text aus
+    function pickVariant(opt){
+      if(Array.isArray(opt.variants) && opt.variants.length > 0){
+        const idx = Math.floor(Math.random() * opt.variants.length);
+        return opt.variants[idx];
+      }
+      return opt.text || opt.label || '';
+    }
+
+    // Fußmatten-Text zufällig wählen
+    function pickMatText(){
+      const t = MAT_TEXTS[Math.floor(Math.random() * MAT_TEXTS.length)];
+      const isRot = t.toLowerCase().includes("kopf drehen");
+      const prefix = isRot ? "Auf der Fußmatte steht quer geschrieben:\n" : "Auf der Fußmatte steht:\n";
+      return prefix + "'" + t + "'";
     }
 
     function showNode(id){
@@ -1035,18 +1876,73 @@ function closeDoor(){
       currentNode = getNode(id);
       if(!currentNode) return;
 
+      // Spezial: CAT_DECISION = automatische Weiterleitung
+      if(currentNode.autoRoute && id === 'CAT_DECISION'){
+        const catChance = 0.70;
+        if(!flavorShown && Math.random() < catChance){
+          flavorShown = true;
+          showNode('CAT_BOSS');
+        } else {
+          showNode('READOUT_EASY');
+        }
+        return;
+      }
+
+// Spezial: PHONE_DECISION = 50% Chance
+if(currentNode.autoRoute && id === 'PHONE_DECISION'){
+  if(Math.random() < 0.50){
+    showNode('PHONE_INTERRUPTION');
+  } else {
+    showNode('READOUT');
+  }
+  return;
+}
+
+// Spezial: NEIGHBOR_DECISION = 40% Chance
+if(currentNode.autoRoute && id === 'NEIGHBOR_DECISION'){
+  if(Math.random() < 0.40){
+    showNode('NEIGHBOR_CURIOUS');
+  } else {
+    showNode('PRICE_OBJECTION');
+  }
+  return;
+}
+
+      // Fußmatten-Event: Text dynamisch setzen
+      if(id === 'DOORMAT_EVENT'){
+        currentNode.text = pickMatText();
+      }
+
+      // Katze anzeigen beim CAT_BOSS Node
+      if(id === 'CAT_BOSS'){
+        catPeek.classList.add('show');
+        playSfx('cat', 0.8);
+      } else {
+        catPeek.classList.remove('show');
+      }
+
+      // Klingelton beim PHONE_INTERRUPTION Node
+      if(id === 'PHONE_INTERRUPTION'){
+        playSfx('ringtone', 0.7);
+      }
+
       applyDoorFromNode(currentNode);
 
       optionsEl.innerHTML = '';
       resultEl.classList.remove('show');
-      srSpeak((currentNode.speaker === 'narrator' ? '' : 'Kunde: ') + currentNode.text);
+      srSpeak((currentNode.speaker === 'narrator' ? 'Erzähler: ' : currentNode.speaker === 'customer' ? 'Kunde: ' : '') + currentNode.text);
+
+      // Spinner für READOUT_WAIT Nodes
+      if(id === 'READOUT_WAIT_EASY' || id === 'READOUT_WAIT'){
+        showStaticWait('Kunde sucht Unterlagen...');
+      } else {
+        hideWait();
+      }
 
       if(currentNode.delayMs){
-        waitingMode = 'delay';
-        animateWait(currentNode.delayMs, 'Kommt gleich …');
         if(openTimerId){ clearTimeout(openTimerId); }
         openTimerId = setTimeout(()=>{
-          waitingMode = null; openTimerId = null; hideWait();
+          openTimerId = null;
           renderOptions(currentNode);
         }, currentNode.delayMs);
       }else{
@@ -1057,10 +1953,10 @@ function closeDoor(){
     function renderOptions(node){
       optionsEl.innerHTML = '';
       (node.options || []).forEach((opt, idx)=>{
-        if(opt.requires && !statePasses(opt.requires)) return;
         const btn = document.createElement('button');
         btn.className = 'option';
-        btn.innerHTML = `<strong>${idx+1}. </strong>${opt.text}`;
+        const displayText = pickVariant(opt);
+        btn.innerHTML = `<strong>${idx+1}. </strong>${displayText}`;
         btn.addEventListener('click', ()=> handleOption(opt));
         optionsEl.appendChild(btn);
       });
@@ -1077,17 +1973,31 @@ function closeDoor(){
         gameStats.outcome = opt.ending;
 
         if(opt.ending === 'success'){
-          openDoor();
+          
+          // Success-Overlay anzeigen
+          successOverlay.classList.add('show');
+          setTimeout(() => successOverlay.classList.remove('show'), 3000);
+          
           showResult('success', opt.note);
           playSfx('success', 0.9);
           updateTrustDisplay();
         } else if(opt.ending === 'warn'){
+          
+          // Warn-Overlay anzeigen
+          warnOverlay.classList.add('show');
+          setTimeout(() => warnOverlay.classList.remove('show'), 3000);
+          
           siren.classList.add('show');
           playSfx('police', 0.9);
           setTimeout(()=> siren.classList.remove('show'), 1500);
           showResult('warn', opt.note || 'Vorsicht.');
           updateTrustDisplay({ drop:true });
         } else if(opt.ending === 'fail'){
+          
+          // Fail-Overlay anzeigen
+          failOverlay.classList.add('show');
+          setTimeout(() => failOverlay.classList.remove('show'), 3000);
+          
           closeDoor();
           showResult('fail', opt.note || 'Gespräch beendet.');
           updateTrustDisplay({ drop:true });
@@ -1200,44 +2110,30 @@ function closeDoor(){
       if(!difficultySelected) return;
       started = true; 
       startOverlay.style.display = 'none'; 
-      document.querySelector('.pulse').style.display = 'none';
       gameStats.startTime = Date.now();
       gameStats.difficulty = selectedDifficulty;
+      
+      // Tree für gewählten Modus laden
+      currentTree = DIALOG_TREES[selectedDifficulty];
     }
 
     function chooseStartScenario(){
       const config = DIFFICULTY[selectedDifficulty];
       
+      // HARD: 30% Chance auf AGGRESSIVE_START
       if(selectedDifficulty === 'HARD' && Math.random() < config.escalationChance){
         showNode('AGGRESSIVE_START');
         return;
       }
 
-      const r = Math.floor(Math.random()*3) + 1;
-      if(r === 1){
-        showNode(DIALOG.start);
-      } else if(r === 2){
-        closeDoor();
-        showBubble('Ja, einen Moment bitte.');
-        srSpeak('Kunde: "Ja, einen Moment bitte." Warte 3 Sekunden …');
-        waitingMode = 'moment';
-        animateWait(CONFIG.momentWaitMs);
-        if(openTimerId){ clearTimeout(openTimerId); }
-        openTimerId = setTimeout(()=>{
-          waitingMode = null; openTimerId = null; hideWait();
-          showNode(DIALOG.start);
-        }, CONFIG.momentWaitMs);
-      } else {
-        closeDoor();
-        srSpeak('Bitte warten …');
-        waitingMode = 'delay';
-        animateWait(CONFIG.genericWaitMs, 'Öffnet gleich …');
-        if(openTimerId){ clearTimeout(openTimerId); }
-        openTimerId = setTimeout(()=>{
-          waitingMode = null; openTimerId = null; hideWait();
-          showNode('ROLE_CHECK');
-        }, CONFIG.genericWaitMs);
-      }
+// NORMAL: 20% Chance auf Bestandskunden-Start
+if(selectedDifficulty === 'NORMAL' && Math.random() < 0.20){
+  showNode('EXISTING_CUSTOMER_START');
+  return;
+}
+
+      // Standard-Start für gewählten Modus
+      showNode(currentTree.start);
     }
 
     function registerKnock(clientX=null, clientY=null, from='door'){
@@ -1250,23 +2146,58 @@ function closeDoor(){
         if(openTimerId){ clearTimeout(openTimerId); openTimerId=null; }
         hideWait();
       }
-      lastKnockAt = now; knocksTotal++;
+      lastKnockAt = now; 
+      knocksTotal++;
+      persistentKnocks++; // Joke-System Zähler
+      
       showBubble(from === 'bell' ? 'Ding Dong' : 'Klopf', clientX, clientY);
       from==='door' ? knockSound() : bellSound();
 
+      // Joke-System: Spezielle Bubbles bei bestimmten Klopf-Zahlen
+      if(persistentKnocks === 5){
+        setTimeout(() => showBubble('Wenn keiner aufmacht, dann ist wohl auch keiner da!', null, null, 3000), 200);
+      } else if(persistentKnocks === 10){
+        setTimeout(() => showBubble('Wenn du nicht aufhörst, dann ruf ich die Polizei!', null, null, 3000), 200);
+      } else if(persistentKnocks === 20){
+        setTimeout(() => showBubble('So jetzt reicht es!', null, null, 3000), 200);
+      } else if(persistentKnocks === 21){
+        // Eskalation auslösen
+        setTimeout(() => {
+          warnOverlay.classList.add('show');
+          setTimeout(() => warnOverlay.classList.remove('show'), 3000);
+          siren.classList.add('show'); 
+          playSfx('police', 0.9); 
+          setTimeout(()=> siren.classList.remove('show'), 1600);
+          showBubble('Die Polizei ist unterwegs!', null, null, 3000);
+          srSpeak('Eskalation durch übermäßiges Klopfen/Klingeln!');
+          
+          // Falls Spiel läuft, beenden
+          if(currentNode){
+            gameStats.endTime = Date.now();
+            gameStats.finalTrust = state.trust;
+            gameStats.outcome = 'warn';
+            showResult('warn', 'Übermäßiges Klopfen führt zur Eskalation.');
+            updateTrustDisplay({ drop:true });
+            showStats();
+            revealCTA();
+          }
+        }, 200);
+        return; // Kein weiteres Processing
+      }
+
       if(waitingMode){
-        const esc = DIALOG.rules?.escalation?.find(r => r.when?.pressedBellDuringDelay);
-        if(esc){
+        // Ungeduld-Eskalation bei NORMAL/HARD
+        if(selectedDifficulty !== 'EASY'){
           if(openTimerId){ clearTimeout(openTimerId); openTimerId = null; }
           waitingMode = null; hideWait();
-          showBubble('Ich habe gesagt: Moment!');
+          showBubble('Ich habe gesagt: Moment!'); // Verwendet Standard 1200ms
           siren.classList.add('show'); playSfx('police', 0.9); setTimeout(()=> siren.classList.remove('show'), 1600);
           openDoor();
           srSpeak('Eskalation nach Drängeln.');
           gameStats.endTime = Date.now();
           gameStats.finalTrust = state.trust;
           gameStats.outcome = 'warn';
-          showResult('warn', esc.message || 'Ungeduld triggert Eskalation.');
+          showResult('warn', 'Ungeduld triggert Eskalation.');
           updateTrustDisplay({ drop:true });
           showStats();
           revealCTA();
@@ -1275,13 +2206,14 @@ function closeDoor(){
       }
 
       const maxKnocks = DIFFICULTY[selectedDifficulty]?.maxKnocks || 2;
-      if(knocksTotal >= maxKnocks){
+      if(knocksTotal >= maxKnocks && !currentNode){
         chooseStartScenario();
       }
     }
 
     document.querySelectorAll('.difficulty-btn').forEach(btn => {
       btn.addEventListener('click', ()=>{
+        unlockAudio();
         const diff = btn.getAttribute('data-difficulty');
         selectedDifficulty = diff;
         difficultySelected = true;
