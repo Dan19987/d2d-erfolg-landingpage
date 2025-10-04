@@ -2235,6 +2235,8 @@ if(selectedDifficulty === 'NORMAL' && Math.random() < 0.20){
 
     function init(){ hardReset(); }
     init();
+      // Audio beim ersten Klick entsperren
+  document.addEventListener('click', unlockAudio, { once: true });
   </script>
 </body>
 </html>
