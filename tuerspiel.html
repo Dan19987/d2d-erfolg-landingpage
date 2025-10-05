@@ -1667,15 +1667,26 @@ let audioUnlocked = false;
 
 function unlockAudio() {
   if(audioUnlocked) return;
-  // Einfaches Audio-Unlock für alle Browser (stumm)
+  
   Object.values(sfx).forEach(audio => {
     if(audio && audio.src) {
       audio.load();
-      audio.volume = 0; // Stumm schalten
-      audio.play().then(() => {
-        audio.pause();
-        audio.volume = 1; // Lautstärke wieder normal
-      }).catch(() => {});
+      audio.muted = true;        // Zuerst muten
+      audio.volume = 0.001;      // Sehr leise als Backup
+      
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+          audio.pause();
+          audio.currentTime = 0;
+          audio.muted = false;   // Unmuten
+          audio.volume = 1;      // Lautstärke zurücksetzen
+        }).catch(() => {
+          // Fehler ignorieren
+          audio.muted = false;
+          audio.volume = 1;
+        });
+      }
     }
   });
   audioUnlocked = true;
@@ -2211,21 +2222,21 @@ if(selectedDifficulty === 'NORMAL' && Math.random() < 0.20){
       }
     }
 
-    document.querySelectorAll('.difficulty-btn').forEach(btn => {
-      btn.addEventListener('click', ()=>{
-        unlockAudio();
-        const diff = btn.getAttribute('data-difficulty');
-        selectedDifficulty = diff;
-        difficultySelected = true;
-        
-        const config = DIFFICULTY[diff];
-        state.trust = config.trustStart;
-        updateTrustDisplay();
+document.querySelectorAll('.difficulty-btn').forEach(btn => {
+  btn.addEventListener('click', ()=>{
+    // unlockAudio(); // <- Diese Zeile entfernen, da es bereits beim ersten Klick passiert
+    const diff = btn.getAttribute('data-difficulty');
+    selectedDifficulty = diff;
+    difficultySelected = true;
+    
+    const config = DIFFICULTY[diff];
+    state.trust = config.trustStart;
+    updateTrustDisplay();
 
-        startOverlay.style.display = 'none';
-        srSpeak(`${config.label} gewählt. Klopfe ${config.maxKnocks}× zum Start.`);
-      });
-    });
+    startOverlay.style.display = 'none';
+    srSpeak(`${config.label} gewählt. Klopfe ${config.maxKnocks}× zum Start.`);
+  });
+});
 
     resetBtn.addEventListener('click', hardReset);
     playAgain.addEventListener('click', ()=>{ hardReset(); });
