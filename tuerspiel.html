@@ -610,7 +610,6 @@
           <div class="logo" aria-hidden="true"></div>
           <div>
             <h1>D2D-Erfolg – Interaktives Türspiel</h1>
-            <div class="subtitle">Advanced Edition mit Schwierigkeitsgraden & Performance-Tracking</div>
           </div>
         </div>
         <button class="btn btn-ghost" id="resetBtn" title="Neu starten" aria-label="Neu starten" style="display:none">Neu starten</button>
@@ -656,10 +655,6 @@
                 <button class="difficulty-btn" data-difficulty="NORMAL">
                   <strong>🟡 Fortgeschritten</strong>
                   <small>Realistische Einwände, skeptischer Kunde. Echte Praxis.</small>
-                </button>
-                <button class="difficulty-btn" data-difficulty="HARD">
-                  <strong>🔴 Profi</strong>
-                  <small>Aggressive Abwehr, Zeitdruck, Nachbarn. Nur für Experten.</small>
                 </button>
               </div>
             </div>
@@ -736,7 +731,7 @@
           </div>
 
           <div class="footer">
-            Advanced Edition • Schwierigkeitsgrade • Performance-Tracking • Extended Dialog
+            D2D-Erfolg – Interaktives Türspiel
           </div>
         </div>
       </div>
@@ -775,14 +770,6 @@
         trustStart: -1,
         maxKnocks: 2,
         allowSecondChance: false
-      },
-      HARD: {
-        label: "Profi",
-        desc: "Aggressive Abwehr, Zeitdruck, Nachbarn. Nur für Experten.",
-        trustStart: -2,
-        maxKnocks: 2,
-        allowSecondChance: false,
-        escalationChance: 0.3
       }
     };
 
@@ -795,7 +782,7 @@
       "Unfassbar, wie viele den Kopf drehen, nur um so einen Scheiß zu lesen."
     ];
 
-    // Dialog-Bäume für alle 3 Modi
+    // Dialog-Bäume für beide Modi
     const DIALOG_TREES = {
       EASY: {
         start: "DOORMAT_EVENT",
@@ -1027,595 +1014,528 @@
       },
 
       NORMAL: {
-  start: "START",
-  nodes: [
-    {
-      id: "START",
-      speaker: "customer",
-      text: "Hallo? Wer ist da?",
-      door: "closed",
-      options: [
-        { 
-          variants: [
-            "Guten Tag, Firma XY. Ich darf bei Ihnen auch nochmal einen Energie-Check durchführen. Haben Sie Interesse?",
-            "Guten Tag! Ich mache heute Energie-Checks in der Straße. Kurz Ihre Preise prüfen?",
-            "Hallo! Kurzer Check wegen der Energiepreise. Dauert keine Minute."
-          ],
-          to: "WHY_ME1", 
-          on: { "trust+": 1, door: "ajar" } 
-        },
-        { 
-          text: "(Visitenkarte zeigen) Ich helfe heute Haus für Haus beim Senken der Nebenkosten.", 
-          to: "WHY_ME", 
-          on: { "trust+": 1, door: "ajar" } 
-        },
-        { 
-          text: "Einmal aufmachen, dauert nur ganz kurz.", 
-          ending: "warn", 
-          note: "Übergriffig", 
-          on: { "trust-": 2 } 
-        },
-        { 
-          text: "Hallo, kennen Sie mich noch? Ich war mal da für Ihre Verträge.", 
-          ending: "fail", 
-          note: "Drücker-Masche", 
-          on: { "trust-": 3 } 
-        }
-      ]
-    },
-
-    // 20% Chance: Bestandskunden-Start
-    {
-      id: "EXISTING_CUSTOMER_START",
-      speaker: "customer",
-      text: "Moment... ich bin doch schon Kunde bei Ihnen seit 2 Jahren.",
-      door: "ajar",
-      options: [
-        { 
-          variants: [
-            "Perfekt! Dann prüfe ich, ob Ihr Tarif noch aktuell ist. Haben Sie auch Gas?",
-            "Super! Ich schaue mal, ob da noch was zu optimieren ist. Gas auch?",
-            "Klasse! Checken wir, ob Sie den besten Tarif haben. Nutzen Sie auch Gas?"
-          ],
-          to: "CROSS_SELL", 
-          on: { "trust+": 2, door: "open" } 
-        },
-        { 
-          text: "Oh, dann ist ja alles gut. Entschuldigung für die Störung.", 
-          ending: "neutral" 
-        },
-        { 
-          text: "Ja, aber wir haben neue Tarife. Unterschreiben Sie schnell.", 
-          ending: "fail", 
-          note: "Druck auf Bestandskunden", 
-          on: { "trust-": 3 } 
-        }
-      ]
-    },
-
-    {
-      id: "WHY_ME1",
-      speaker: "customer",
-      text: "Nein, ich brauch das nicht. Dankeschön.",
-      door: "ajar",
-      options: [
-        { 
-          text: "Auch nicht, wenn es sich für Sie lohnt? Sie könnten viel Geld sparen.", 
-          to: "NO_ANSWER", 
-          on: { "trust-": 1 } 
-        },
-        { 
-          variants: [
-            "Verstehe. Wenn es nicht passt, bin ich in 20 Sekunden wieder weg.",
-            "Klar. Falls nichts dabei ist, bin ich gleich wieder weg.",
-            "Alles gut. Passt's nicht, bin ich in 20 Sekunden weg."
-          ],
-          to: "ID_CHECK", 
-          on: { "trust+": 2, door: "open" } 
-        },
-        { 
-          text: "Klar brauchen Sie das. Jeder will Geld sparen!", 
-          ending: "fail", 
-          note: "Unsympathisch", 
-          on: { "trust-": 3 } 
-        }
-      ]
-    },
-
-    {
-      id: "WHY_ME",
-      speaker: "customer",
-      text: "Warum ausgerechnet bei mir?",
-      door: "ajar",
-      options: [
-        { 
-          variants: [
-            "Viele haben bereits eine Erhöhung erhalten. Ich prüfe fair & unverbindlich.",
-            "Die Preise sind 2024 gestiegen. Ich check das kostenlos für Sie.",
-            "Energiekosten explodieren. Ich prüf nur, ob Sie betroffen sind."
-          ],
-          to: "ID_CHECK", 
-          on: { "trust+": 2, door: "open" } 
-        },
-        { 
-          text: "Ich mache das hier in der ganzen Straße. Ist natürlich freiwillig.", 
-          to: "ID_CHECK", 
-          on: { "trust+": 1, door: "open" } 
-        },
-        { 
-          text: "Ich wurde extra für Sie vorbeigeschickt. Haben Sie ein Stück Tisch frei?", 
-          ending: "fail", 
-          note: "Lüge/Drücker", 
-          on: { "trust-": 3 } 
-        }
-      ]
-    },
-
-    {
-      id: "NO_ANSWER",
-      speaker: "customer",
-      text: "Ich sagte Nein, danke!",
-      door: "ajar",
-      options: [
-        { 
-          text: "Ach kommen Sie schon. Geben Sie sich einen Ruck.", 
-          ending: "fail", 
-          note: "Was verstehen Sie nicht an NEIN?!", 
-          on: { "trust-": 3 } 
-        },
-        { 
-          variants: [
-            "Ok, kein Problem. Dann wünsche ich Ihnen noch einen angenehmen Tag.",
-            "Alles klar, verstehe. Schönen Tag noch!",
-            "Passt. Danke für Ihre Zeit. Schönen Tag!"
-          ],
-          ending: "neutral" 
-        },
-        { 
-          text: "Sind Sie auch Kunde bei XY? Dann ist es wie bei vielen Nachbarn. Vermutlich XY-Preis. Holen Sie ein Schreiben, dann zeige ich Ihnen, was das heißt.", 
-          to: "DOCS", 
-          on: { "trust+": 2, door: "open" } 
-        }
-      ]
-    },
-
-    {
-      id: "ID_CHECK",
-      speaker: "customer",
-      text: "Moment, zeigen Sie mir erst mal Ihren Ausweis. Wir hatten hier schon Betrüger.",
-      door: "open",
-      options: [
-        { 
-          variants: [
-            "(Ausweis zeigen) Selbstverständlich. Hier, bitte sehr.",
-            "(Ausweis zeigen) Klar, gern. Hier.",
-            "(Ausweis zeigen) Natürlich. Bitteschön."
-          ],
-          to: "ROLE_CHECK", 
-          on: { "trust+": 3 } 
-        },
-        { 
-          text: "Das ist nicht nötig, vertrauen Sie mir einfach.", 
-          ending: "fail", 
-          note: "Verweigerung wirkt verdächtig", 
-          on: { "trust-": 3 } 
-        },
-        { 
-          text: "Ich habe keine Zeit für sowas. Machen Sie mit oder nicht?", 
-          ending: "warn", 
-          note: "Arroganz verschärft Misstrauen", 
-          on: { "trust-": 2 } 
-        }
-      ]
-    },
-
-    {
-      id: "ROLE_CHECK",
-      speaker: "customer",
-      text: "Sind Sie von meinem Anbieter?",
-      options: [
-        { 
-          variants: [
-            "Nein. Ich vergleiche und erkläre, wann sich Wechsel oder Anpassungen lohnen.",
-            "Nein, ich bin unabhängig. Ich zeig Ihnen nur, wo Sie sparen können.",
-            "Nein. Ich vergleiche Tarife – neutral und kostenlos."
-          ],
-          to: "TENANT_OWNER", 
-          on: { "trust+": 2 } 
-        },
-        { 
-          text: "Mehr so… irgendwas dazwischen.", 
-          ending: "warn", 
-          note: "Unklar", 
-          on: { "trust-": 1 } 
-        },
-        { 
-          text: "Ja klar!", 
-          ending: "fail", 
-          note: "Lüge", 
-          on: { "trust-": 3 } 
-        }
-      ]
-    },
-
-    {
-      id: "TENANT_OWNER",
-      speaker: "customer",
-      text: "Ich bin Mieter. Bringt das überhaupt was?",
-      options: [
-        { 
-          variants: [
-            "Ja. Arbeitspreis und Grundpreis betreffen auch Mieter. Ein Blick auf die Abrechnung reicht.",
-            "Klar! Mieter zahlen Strom selbst. Ein Blick auf die Rechnung genügt.",
-            "Ja, als Mieter erst recht. Ihre Stromkosten bestimmen Sie. Kurz die Rechnung?"
-          ],
-          to: "SETTLING_IN", 
-          on: { "trust+": 2 } 
-        },
-        { 
-          text: "Als Eigentümer wäre PV spannend. Als Mieter checken wir den Stromtarif. 60 Sek.?", 
-          to: "SETTLING_IN" 
-        },
-        { 
-          text: "Dann nicht.", 
-          ending: "fail" 
-        }
-      ]
-    },
-
-    {
-      id: "SETTLING_IN",
-      speaker: "customer",
-      text: "Kommen Sie rein. Setzen Sie sich. Möchten Sie was trinken?",
-      door: "open",
-      options: [
-        { 
-          variants: [
-            "Gern ein Glas Wasser, danke. Wo kann ich mich hinsetzen?",
-            "Ein Wasser wäre super, danke. Darf ich hier Platz nehmen?",
-            "Danke, gern. Wo darf ich mich hinsetzen?"
-          ],
-          to: "DOCS", 
-          on: { "trust+": 2 } 
-        },
-        { 
-          text: "Nein danke, muss schnell gehen. Wo sind Ihre Unterlagen?", 
-          to: "DOCS", 
-          on: { "trust-": 1 } 
-        },
-        { 
-          text: "Ich bleibe stehen, dauert ja nicht lange.", 
-          to: "DOCS" 
-        }
-      ]
-    },
-
-    {
-      id: "CROSS_SELL",
-      speaker: "customer",
-      text: "Gas habe ich bei einem anderen Anbieter. Läuft aber gut.",
-      door: "open",
-      options: [
-        { 
-          variants: [
-            "Verstehe. Mit Kombi-Tarif könnten Sie nochmal 10-15% sparen. Rechnung zur Hand?",
-            "Ok. Kombi ist oft günstiger. Haben Sie die Gas-Rechnung da?",
-            "Verstehe. Zusammen spart man meist mehr. Rechnung griffbereit?"
-          ],
-          to: "DOCS", 
-          on: { "trust+": 2 } 
-        },
-        { 
-          text: "Dann lassen wir das. Danke für Ihre Zeit.", 
-          ending: "neutral" 
-        }
-      ]
-    },
-
-    {
-      id: "DOCS",
-      speaker: "customer",
-      text: "Ich habe die Unterlagen gerade nicht hier.",
-      door: "open",
-      options: [
-        { 
-          variants: [
-            "Kein Stress. Ein älteres Schreiben reicht auch. Oben rechts stehen Anbieter und Preise.",
-            "Kein Problem. Auch ein altes tut's. Da stehen die Preise drauf.",
-            "Macht nichts. Selbst ein altes Schreiben reicht – die Preise stehen oben."
-          ],
-          to: "READOUT_WAIT", 
-          on: { "trust+": 2 } 
-        },
-        { 
-          text: "Ich blocke 18:00 für einen 5-Minuten-Check. Passt das?", 
-          ending: "success", 
-          tag: "appointment",
-          note: "Termin vereinbart", 
-          on: { "trust+": 3 } 
-        },
-        { 
-          text: "Dann holen Sie sie eben schnell.", 
-          ending: "fail", 
-          note: "Druck", 
-          on: { "trust-": 3 } 
-        }
-      ]
-    },
-
-    {
-      id: "READOUT_WAIT",
-      speaker: "narrator",
-      text: "(Der Kunde kramt kurz…)",
-      door: "open",
-      options: [
-        { 
-          text: "(Geduldig warten, freundlich lächeln)", 
-          to: "PHONE_DECISION",  // Weiche zu Phone-Event
-          on: { "trust+": 2 } 
-        },
-        { 
-          text: "(Nochmal klingeln/klopfen)", 
-          ending: "warn", 
-          note: "Ungeduld", 
-          on: { "trust-": 2 } 
-        }
-      ]
-    },
-
-    // Phone-Weiche (50% Chance)
-    {
-      id: "PHONE_DECISION",
-      speaker: "system",
-      text: "",
-      door: "open",
-      autoRoute: true,
-      options: []
-    },
-
-    {
-      id: "PHONE_INTERRUPTION",
-      speaker: "narrator",
-      text: "Das Handy des Kunden klingelt. Er schaut aufs Display.\nKunde: 'Sorry, muss ich kurz rangehen. Moment.'",
-      door: "open",
-      options: [
-        { 
-          variants: [
-            "(Nickt) Kein Problem, lassen Sie sich Zeit.",
-            "(Lächelt) Alles gut, gehen Sie ran.",
-            "Klar, kein Stress."
-          ],
-          to: "READOUT", 
-          on: { "trust+": 2 } 
-        },
-        { 
-          text: "(Genervt seufzen und auf die Uhr schauen)", 
-          ending: "warn", 
-          note: "Ungeduldig", 
-          on: { "trust-": 2 } 
-        }
-      ]
-    },
-
-    {
-      id: "READOUT",
-      speaker: "customer",
-      text: "Hier: Grundpreis 13,90 €, Arbeitspreis 39,5 ct/kWh.",
-      door: "open",
-      options: [
-        { 
-          variants: [
-            "Danke. Bei ca. 3.200 kWh sparen Sie grob ~360 € pro Jahr. Ich zeige kurz die Alternative.",
-            "Perfekt. Das sind etwa 360 € Ersparnis im Jahr. Kurz durchrechnen?",
-            "Super. Bei Ihrem Verbrauch locker 360 € weniger pro Jahr. Zeig ich Ihnen."
-          ],
-          to: "NEIGHBOR_DECISION", 
-          on: { "trust+": 2 } 
-        },
-        { 
-          text: "Ihr Anbieter ist Abzocke! Sofort kündigen!", 
-          ending: "warn", 
-          note: "Framing schlecht", 
-          on: { "trust-": 2 } 
-        }
-      ]
-    },
-
-    // Nachbar-Weiche (40% Chance)
-    {
-      id: "NEIGHBOR_DECISION",
-      speaker: "system",
-      text: "",
-      door: "open",
-      autoRoute: true,
-      options: []
-    },
-
-    {
-      id: "NEIGHBOR_CURIOUS",
-      speaker: "narrator",
-      text: "Die Nachbarin von nebenan steckt neugierig den Kopf rein.\nNachbarin: 'Was macht der denn hier? Alles okay bei dir?'",
-      door: "open",
-      options: [
-        { 
-          variants: [
-            "(Freundlich zur Nachbarin) Guten Tag! Ich erkläre gerade Energiepreise. Interesse?",
-            "(Lächelt zur Nachbarin) Hallo! Nur ein Preis-Check. Wollen Sie auch?",
-            "(Winkt zur Nachbarin) Tag! Strompreise. Soll ich bei Ihnen auch?"
-          ],
-          to: "PRICE_OBJECTION", 
-          on: { "trust+": 2 } 
-        },
-        { 
-          text: "(Ignoriert Nachbarin, spricht weiter mit Kunde)", 
-          to: "PRICE_OBJECTION", 
-          on: { "trust-": 1 } 
-        },
-        { 
-          text: "(Genervt) Könnten wir das bitte unter vier Augen klären?", 
-          ending: "warn", 
-          note: "Nachbarin fühlt sich angegriffen", 
-          on: { "trust-": 2 } 
-        }
-      ]
-    },
-
-    {
-      id: "PRICE_OBJECTION",
-      speaker: "customer",
-      text: "Das klingt teuer. Ich zahle aktuell 120 € im Monat.",
-      door: "open",
-      options: [
-        { 
-          variants: [
-            "Verstehe. Neu wären etwa 90 €/Monat. Wollen wir das kurz sauber durchrechnen?",
-            "Ok. Neu: 90 € statt 120 €. Rechnen wir das mal durch?",
-            "Verstehe. Mit dem neuen Tarif nur noch 90 €. Kurz die Rechnung?"
-          ],
-          to: "PARTNER_JOINS", 
-          on: { "trust+": 3 } 
-        },
-        { 
-          text: "Das ist doch nicht teuer! Sie zahlen viel zu viel!", 
-          ending: "warn", 
-          note: "Unsensibel", 
-          on: { "trust-": 2 } 
-        }
-      ]
-    },
-
-    {
-      id: "PARTNER_JOINS",
-      speaker: "narrator",
-      text: "Die Wohnungstür geht auf. Der Partner des Kunden kommt nach Hause.\nPartner: 'Was ist denn hier los? Wer sind Sie?'",
-      door: "open",
-      options: [
-        { 
-          variants: [
-            "(Freundlich) Guten Tag! Ich erkläre gerade Energiepreise. Perfekt, dass Sie da sind – dann können Sie direkt mit entscheiden.",
-            "(Lächelt) Hallo! Stromkosten-Check. Gut, dass Sie da sind – so hören Sie's auch.",
-            "Guten Tag! Energie-Vergleich. Super Timing – jetzt können Sie mitentscheiden."
-          ],
-          to: "FAST_EXPLAIN_BOTH", 
-          on: { "trust+": 3 } 
-        },
-        { 
-          text: "(Zum Kunden) Unterschreiben Sie schnell, bevor er nein sagt.", 
-          ending: "fail", 
-          note: "Manipulation", 
-          on: { "trust-": 3 } 
-        },
-        { 
-          text: "(Zum Partner) Ihr Partner spart 360 € im Jahr. Wollen Sie das verhindern?", 
-          ending: "warn", 
-          note: "Passiv-aggressiv", 
-          on: { "trust-": 2 } 
-        }
-      ]
-    },
-
-    {
-      id: "FAST_EXPLAIN_BOTH",
-      speaker: "sales",
-      text: "Ablauf in 30 Sekunden: Anmeldung, Kündigungsfristen, Abschlag anpassen, alles schriftlich. Ich bleibe Ihr Ansprechpartner.\n\nPartner (zum Kunden): 'Was meinst du?'",
-      door: "open",
-      options: [
-        { 
-          text: "Kunde: 'Klingt gut. Machen wir.'", 
-          ending: "success", 
-          note: "Beide überzeugt", 
-          on: { "trust+": 3 } 
-        },
-        { 
-          text: "Kunde: 'Lass uns drüber schlafen.' → Spieler: 'Verstehe. Ich komme morgen 18:00 nochmal vorbei. 3 Minuten.'", 
-          ending: "success",
-          tag: "appointment",
-          note: "Termin vereinbart", 
-          on: { "trust+": 2 } 
-        },
-        { 
-          text: "Kunde: 'Lass uns drüber schlafen.' → Spieler: 'Wenn Sie jetzt nicht unterschreiben, ist das Angebot weg.'", 
-          ending: "warn", 
-          note: "Druckmasche", 
-          on: { "trust-": 3 } 
-        },
-        { 
-          text: "Partner: 'Wir brauchen das nicht.' → Spieler: 'Alles klar, verstehe. Hier meine Karte, falls Sie es sich anders überlegen.'", 
-          ending: "neutral" 
-        },
-        { 
-          text: "Partner: 'Wir brauchen das nicht.' → Spieler: 'Sie verschenken gerade 360 € pro Jahr.'", 
-          ending: "warn", 
-          note: "Aufdringlich", 
-          on: { "trust-": 2 } 
-        }
-      ]
-    }
-  ]
-},
-
-      HARD: {
-        start: "START", // oder "AGGRESSIVE_START" bei Escalation
+        start: "START",
         nodes: [
-          {
-            id: "AGGRESSIVE_START",
-            speaker: "customer",
-            text: "HIER STEHT KEINE VERTRETER! Können Sie nicht lesen?!",
-            door: "closed",
-            options: [
-              { text: "Entschuldigung, das habe ich übersehen. Ich gehe sofort.", ending: "neutral", note: "Respektvoller Rückzug", on: { "trust+": 1 } },
-              { text: "Ich bin kein Vertreter, sondern Energieberater.", ending: "fail", note: "Haarspalterei verärgert nur mehr" },
-              { text: "Das Schild gilt nicht für mich, ich bin vom Anbieter.", ending: "fail", note: "Lüge wird sofort durchschaut" }
-            ]
-          },
           {
             id: "START",
             speaker: "customer",
             text: "Hallo? Wer ist da?",
             door: "closed",
             options: [
-              { text: "Guten Tag, ich bin Daniel aus der Nachbarschaft. Kurzer Energie-Check – 60 Sekunden.", to: "WHY_ME", on: { "trust+": 1, door: "ajar" } },
-              { text: "Einmal aufmachen, dauert nur ganz kurz.", ending: "warn", note: "Übergriffig", on: { "trust-": 1 } }
+              { 
+                variants: [
+                  "Guten Tag, Firma XY. Ich darf bei Ihnen auch nochmal einen Energie-Check durchführen. Haben Sie Interesse?",
+                  "Guten Tag! Ich mache heute Energie-Checks in der Straße. Kurz Ihre Preise prüfen?",
+                  "Hallo! Kurzer Check wegen der Energiepreise. Dauert keine Minute."
+                ],
+                to: "WHY_ME1", 
+                on: { "trust+": 1, door: "ajar" } 
+              },
+              { 
+                text: "(Visitenkarte zeigen) Ich helfe heute Haus für Haus beim Senken der Nebenkosten.", 
+                to: "WHY_ME", 
+                on: { "trust+": 1, door: "ajar" } 
+              },
+              { 
+                text: "Einmal aufmachen, dauert nur ganz kurz.", 
+                ending: "warn", 
+                note: "Übergriffig", 
+                on: { "trust-": 2 } 
+              },
+              { 
+                text: "Hallo, kennen Sie mich noch? Ich war mal da für Ihre Verträge.", 
+                ending: "fail", 
+                note: "Drücker-Masche", 
+                on: { "trust-": 3 } 
+              }
             ]
           },
+
+          // 20% Chance: Bestandskunden-Start
+          {
+            id: "EXISTING_CUSTOMER_START",
+            speaker: "customer",
+            text: "Moment... ich bin doch schon Kunde bei Ihnen seit 2 Jahren.",
+            door: "ajar",
+            options: [
+              { 
+                variants: [
+                  "Perfekt! Dann prüfe ich, ob Ihr Tarif noch aktuell ist. Haben Sie auch Gas?",
+                  "Super! Ich schaue mal, ob da noch was zu optimieren ist. Gas auch?",
+                  "Klasse! Checken wir, ob Sie den besten Tarif haben. Nutzen Sie auch Gas?"
+                ],
+                to: "CROSS_SELL", 
+                on: { "trust+": 2, door: "open" } 
+              },
+              { 
+                text: "Oh, dann ist ja alles gut. Entschuldigung für die Störung.", 
+                ending: "neutral" 
+              },
+              { 
+                text: "Ja, aber wir haben neue Tarife. Unterschreiben Sie schnell.", 
+                ending: "fail", 
+                note: "Druck auf Bestandskunden", 
+                on: { "trust-": 3 } 
+              }
+            ]
+          },
+
+          {
+            id: "WHY_ME1",
+            speaker: "customer",
+            text: "Nein, ich brauch das nicht. Dankeschön.",
+            door: "ajar",
+            options: [
+              { 
+                text: "Auch nicht, wenn es sich für Sie lohnt? Sie könnten viel Geld sparen.", 
+                to: "NO_ANSWER", 
+                on: { "trust-": 1 } 
+              },
+              { 
+                variants: [
+                  "Verstehe. Wenn es nicht passt, bin ich in 20 Sekunden wieder weg.",
+                  "Klar. Falls nichts dabei ist, bin ich gleich wieder weg.",
+                  "Alles gut. Passt's nicht, bin ich in 20 Sekunden weg."
+                ],
+                to: "ID_CHECK", 
+                on: { "trust+": 2, door: "open" } 
+              },
+              { 
+                text: "Klar brauchen Sie das. Jeder will Geld sparen!", 
+                ending: "fail", 
+                note: "Unsympathisch", 
+                on: { "trust-": 3 } 
+              }
+            ]
+          },
+
           {
             id: "WHY_ME",
             speaker: "customer",
             text: "Warum ausgerechnet bei mir?",
             door: "ajar",
             options: [
-              { text: "Viele Verträge 2022/23 sind zu hoch. Ich prüfe fair & unverbindlich.", to: "NEIGHBOR_INTERFERENCE", on: { "trust+": 1 } },
-              { text: "Chef sagt, ich muss.", ending: "fail", note: "Unsympathisch" }
+              { 
+                variants: [
+                  "Viele haben bereits eine Erhöhung erhalten. Ich prüfe fair & unverbindlich.",
+                  "Die Preise sind 2024 gestiegen. Ich check das kostenlos für Sie.",
+                  "Energiekosten explodieren. Ich prüf nur, ob Sie betroffen sind."
+                ],
+                to: "ID_CHECK", 
+                on: { "trust+": 2, door: "open" } 
+              },
+              { 
+                text: "Ich mache das hier in der ganzen Straße. Ist natürlich freiwillig.", 
+                to: "ID_CHECK", 
+                on: { "trust+": 1, door: "open" } 
+              },
+              { 
+                text: "Ich wurde extra für Sie vorbeigeschickt. Haben Sie ein Stück Tisch frei?", 
+                ending: "fail", 
+                note: "Lüge/Drücker", 
+                on: { "trust-": 3 } 
+              }
             ]
           },
+
           {
-            id: "NEIGHBOR_INTERFERENCE",
-            speaker: "narrator",
-            text: "Ein Nachbar ruft aus dem Flur: 'Die haben mich auch verarscht! Mach bloß nichts!'",
+            id: "NO_ANSWER",
+            speaker: "customer",
+            text: "Ich sagte Nein, danke!",
+            door: "ajar",
             options: [
-              { text: "(Fokus auf Kunden) 'Lassen Sie uns in Ruhe besprechen. Jeder Fall ist anders.'", to: "ROLE_CHECK", on: { "trust+": 1 } },
-              { text: "(Zum Nachbarn) 'Das stimmt nicht! Sie verwechseln uns mit jemand anderem!'", ending: "warn", note: "Diskussion eskaliert" },
-              { text: "(Zum Nachbarn) 'Halten Sie sich da raus, das geht Sie nichts an!'", ending: "fail", note: "Beleidigung zerstört alles" }
+              { 
+                text: "Ach kommen Sie schon. Geben Sie sich einen Ruck.", 
+                ending: "fail", 
+                note: "Was verstehen Sie nicht an NEIN?!", 
+                on: { "trust-": 3 } 
+              },
+              { 
+                variants: [
+                  "Ok, kein Problem. Dann wünsche ich Ihnen noch einen angenehmen Tag.",
+                  "Alles klar, verstehe. Schönen Tag noch!",
+                  "Passt. Danke für Ihre Zeit. Schönen Tag!"
+                ],
+                ending: "neutral" 
+              },
+              { 
+                text: "Sind Sie auch Kunde bei XY? Dann ist es wie bei vielen Nachbarn. Vermutlich XY-Preis. Holen Sie ein Schreiben, dann zeige ich Ihnen, was das heißt.", 
+                to: "DOCS", 
+                on: { "trust+": 2, door: "open" } 
+              }
             ]
           },
+
+          {
+            id: "ID_CHECK",
+            speaker: "customer",
+            text: "Moment, zeigen Sie mir erst mal Ihren Ausweis. Wir hatten hier schon Betrüger.",
+            door: "open",
+            options: [
+              { 
+                variants: [
+                  "(Ausweis zeigen) Selbstverständlich. Hier, bitte sehr.",
+                  "(Ausweis zeigen) Klar, gern. Hier.",
+                  "(Ausweis zeigen) Natürlich. Bitteschön."
+                ],
+                to: "ROLE_CHECK", 
+                on: { "trust+": 3 } 
+              },
+              { 
+                text: "Das ist nicht nötig, vertrauen Sie mir einfach.", 
+                ending: "fail", 
+                note: "Verweigerung wirkt verdächtig", 
+                on: { "trust-": 3 } 
+              },
+              { 
+                text: "Ich habe keine Zeit für sowas. Machen Sie mit oder nicht?", 
+                ending: "warn", 
+                note: "Arroganz verschärft Misstrauen", 
+                on: { "trust-": 2 } 
+              }
+            ]
+          },
+
           {
             id: "ROLE_CHECK",
             speaker: "customer",
             text: "Sind Sie von meinem Anbieter?",
             options: [
-              { text: "Nein. Ich vergleiche und erkläre, wann sich Wechsel oder Anpassungen lohnen.", to: "STRESS_COMBO" },
-              { text: "Mehr so… irgendwas dazwischen.", ending: "warn", note: "Unklarheit", on: { "trust-": 1 } }
+              { 
+                variants: [
+                  "Nein. Ich vergleiche und erkläre, wann sich Wechsel oder Anpassungen lohnen.",
+                  "Nein, ich bin unabhängig. Ich zeig Ihnen nur, wo Sie sparen können.",
+                  "Nein. Ich vergleiche Tarife – neutral und kostenlos."
+                ],
+                to: "TENANT_OWNER", 
+                on: { "trust+": 2 } 
+              },
+              { 
+                text: "Mehr so… irgendwas dazwischen.", 
+                ending: "warn", 
+                note: "Unklar", 
+                on: { "trust-": 1 } 
+              },
+              { 
+                text: "Ja klar!", 
+                ending: "fail", 
+                note: "Lüge", 
+                on: { "trust-": 3 } 
+              }
             ]
           },
+
           {
-            id: "STRESS_COMBO",
+            id: "TENANT_OWNER",
             speaker: "customer",
-            text: "(Handy am Ohr, Kind schreit im Hintergrund) 'Ich habe gerade WIRKLICH keine Zeit!'",
-            door: "ajar",
+            text: "Ich bin Mieter. Bringt das überhaupt was?",
             options: [
-              { text: "Verstehe total. Darf ich morgen 18 Uhr nochmal vorbeikommen? 5 Minuten reichen.", ending: "success", note: "Empathie + Termin = Win", on: { "trust+": 2 } },
-              { text: "Das dauert nur 30 Sekunden, wirklich! Nur schnell unterschreiben.", ending: "warn", note: "Druck in Stresssituation = Katastrophe" },
-              { text: "(Warten, bis Kunde fertig telefoniert hat)", ending: "fail", note: "Zeitverschwendung, Kunde genervt" }
+              { 
+                variants: [
+                  "Ja. Arbeitspreis und Grundpreis betreffen auch Mieter. Ein Blick auf die Abrechnung reicht.",
+                  "Klar! Mieter zahlen Strom selbst. Ein Blick auf die Rechnung genügt.",
+                  "Ja, als Mieter erst recht. Ihre Stromkosten bestimmen Sie. Kurz die Rechnung?"
+                ],
+                to: "SETTLING_IN", 
+                on: { "trust+": 2 } 
+              },
+              { 
+                text: "Als Eigentümer wäre PV spannend. Als Mieter checken wir den Stromtarif. 60 Sek.?", 
+                to: "SETTLING_IN" 
+              },
+              { 
+                text: "Dann nicht.", 
+                ending: "fail" 
+              }
+            ]
+          },
+
+          {
+            id: "SETTLING_IN",
+            speaker: "customer",
+            text: "Kommen Sie rein. Setzen Sie sich. Möchten Sie was trinken?",
+            door: "open",
+            options: [
+              { 
+                variants: [
+                  "Gern ein Glas Wasser, danke. Wo kann ich mich hinsetzen?",
+                  "Ein Wasser wäre super, danke. Darf ich hier Platz nehmen?",
+                  "Danke, gern. Wo darf ich mich hinsetzen?"
+                ],
+                to: "DOCS", 
+                on: { "trust+": 2 } 
+              },
+              { 
+                text: "Nein danke, muss schnell gehen. Wo sind Ihre Unterlagen?", 
+                to: "DOCS", 
+                on: { "trust-": 1 } 
+              },
+              { 
+                text: "Ich bleibe stehen, dauert ja nicht lange.", 
+                to: "DOCS" 
+              }
+            ]
+          },
+
+          {
+            id: "CROSS_SELL",
+            speaker: "customer",
+            text: "Gas habe ich bei einem anderen Anbieter. Läuft aber gut.",
+            door: "open",
+            options: [
+              { 
+                variants: [
+                  "Verstehe. Mit Kombi-Tarif könnten Sie nochmal 10-15% sparen. Rechnung zur Hand?",
+                  "Ok. Kombi ist oft günstiger. Haben Sie die Gas-Rechnung da?",
+                  "Verstehe. Zusammen spart man meist mehr. Rechnung griffbereit?"
+                ],
+                to: "DOCS", 
+                on: { "trust+": 2 } 
+              },
+              { 
+                text: "Dann lassen wir das. Danke für Ihre Zeit.", 
+                ending: "neutral" 
+              }
+            ]
+          },
+
+          {
+            id: "DOCS",
+            speaker: "customer",
+            text: "Ich habe die Unterlagen gerade nicht hier.",
+            door: "open",
+            options: [
+              { 
+                variants: [
+                  "Kein Stress. Ein älteres Schreiben reicht auch. Oben rechts stehen Anbieter und Preise.",
+                  "Kein Problem. Auch ein altes tut's. Da stehen die Preise drauf.",
+                  "Macht nichts. Selbst ein altes Schreiben reicht – die Preise stehen oben."
+                ],
+                to: "READOUT_WAIT", 
+                on: { "trust+": 2 } 
+              },
+              { 
+                text: "Ich blocke 18:00 für einen 5-Minuten-Check. Passt das?", 
+                ending: "success", 
+                tag: "appointment",
+                note: "Termin vereinbart", 
+                on: { "trust+": 3 } 
+              },
+              { 
+                text: "Dann holen Sie sie eben schnell.", 
+                ending: "fail", 
+                note: "Druck", 
+                on: { "trust-": 3 } 
+              }
+            ]
+          },
+
+          {
+            id: "READOUT_WAIT",
+            speaker: "narrator",
+            text: "(Der Kunde kramt kurz…)",
+            door: "open",
+            options: [
+              { 
+                text: "(Geduldig warten, freundlich lächeln)", 
+                to: "PHONE_DECISION",  // Weiche zu Phone-Event
+                on: { "trust+": 2 } 
+              },
+              { 
+                text: "(Nochmal klingeln/klopfen)", 
+                ending: "warn", 
+                note: "Ungeduld", 
+                on: { "trust-": 2 } 
+              }
+            ]
+          },
+
+          // Phone-Weiche (50% Chance)
+          {
+            id: "PHONE_DECISION",
+            speaker: "system",
+            text: "",
+            door: "open",
+            autoRoute: true,
+            options: []
+          },
+
+          {
+            id: "PHONE_INTERRUPTION",
+            speaker: "narrator",
+            text: "Das Handy des Kunden klingelt. Er schaut aufs Display.\nKunde: 'Sorry, muss ich kurz rangehen. Moment.'",
+            door: "open",
+            options: [
+              { 
+                variants: [
+                  "(Nickt) Kein Problem, lassen Sie sich Zeit.",
+                  "(Lächelt) Alles gut, gehen Sie ran.",
+                  "Klar, kein Stress."
+                ],
+                to: "READOUT", 
+                on: { "trust+": 2 } 
+              },
+              { 
+                text: "(Genervt seufzen und auf die Uhr schauen)", 
+                ending: "warn", 
+                note: "Ungeduldig", 
+                on: { "trust-": 2 } 
+              }
+            ]
+          },
+
+          {
+            id: "READOUT",
+            speaker: "customer",
+            text: "Hier: Grundpreis 13,90 €, Arbeitspreis 39,5 ct/kWh.",
+            door: "open",
+            options: [
+              { 
+                variants: [
+                  "Danke. Bei ca. 3.200 kWh sparen Sie grob ~360 € pro Jahr. Ich zeige kurz die Alternative.",
+                  "Perfekt. Das sind etwa 360 € Ersparnis im Jahr. Kurz durchrechnen?",
+                  "Super. Bei Ihrem Verbrauch locker 360 € weniger pro Jahr. Zeig ich Ihnen."
+                ],
+                to: "NEIGHBOR_DECISION", 
+                on: { "trust+": 2 } 
+              },
+              { 
+                text: "Ihr Anbieter ist Abzocke! Sofort kündigen!", 
+                ending: "warn", 
+                note: "Framing schlecht", 
+                on: { "trust-": 2 } 
+              }
+            ]
+          },
+
+          // Nachbar-Weiche (40% Chance)
+          {
+            id: "NEIGHBOR_DECISION",
+            speaker: "system",
+            text: "",
+            door: "open",
+            autoRoute: true,
+            options: []
+          },
+
+          {
+            id: "NEIGHBOR_CURIOUS",
+            speaker: "narrator",
+            text: "Die Nachbarin von nebenan steckt neugierig den Kopf rein.\nNachbarin: 'Was macht der denn hier? Alles okay bei dir?'",
+            door: "open",
+            options: [
+              { 
+                variants: [
+                  "(Freundlich zur Nachbarin) Guten Tag! Ich erkläre gerade Energiepreise. Interesse?",
+                  "(Lächelt zur Nachbarin) Hallo! Nur ein Preis-Check. Wollen Sie auch?",
+                  "(Winkt zur Nachbarin) Tag! Strompreise. Soll ich bei Ihnen auch?"
+                ],
+                to: "PRICE_OBJECTION", 
+                on: { "trust+": 2 } 
+              },
+              { 
+                text: "(Ignoriert Nachbarin, spricht weiter mit Kunde)", 
+                to: "PRICE_OBJECTION", 
+                on: { "trust-": 1 } 
+              },
+              { 
+                text: "(Genervt) Könnten wir das bitte unter vier Augen klären?", 
+                ending: "warn", 
+                note: "Nachbarin fühlt sich angegriffen", 
+                on: { "trust-": 2 } 
+              }
+            ]
+          },
+
+          {
+            id: "PRICE_OBJECTION",
+            speaker: "customer",
+            text: "Das klingt teuer. Ich zahle aktuell 120 € im Monat.",
+            door: "open",
+            options: [
+              { 
+                variants: [
+                  "Verstehe. Neu wären etwa 90 €/Monat. Wollen wir das kurz sauber durchrechnen?",
+                  "Ok. Neu: 90 € statt 120 €. Rechnen wir das mal durch?",
+                  "Verstehe. Mit dem neuen Tarif nur noch 90 €. Kurz die Rechnung?"
+                ],
+                to: "PARTNER_JOINS", 
+                on: { "trust+": 3 } 
+              },
+              { 
+                text: "Das ist doch nicht teuer! Sie zahlen viel zu viel!", 
+                ending: "warn", 
+                note: "Unsensibel", 
+                on: { "trust-": 2 } 
+              }
+            ]
+          },
+
+          {
+            id: "PARTNER_JOINS",
+            speaker: "narrator",
+            text: "Die Wohnungstür geht auf. Der Partner des Kunden kommt nach Hause.\nPartner: 'Was ist denn hier los? Wer sind Sie?'",
+            door: "open",
+            options: [
+              { 
+                variants: [
+                  "(Freundlich) Guten Tag! Ich erkläre gerade Energiepreise. Perfekt, dass Sie da sind – dann können Sie direkt mit entscheiden.",
+                  "(Lächelt) Hallo! Stromkosten-Check. Gut, dass Sie da sind – so hören Sie's auch.",
+                  "Guten Tag! Energie-Vergleich. Super Timing – jetzt können Sie mitentscheiden."
+                ],
+                to: "FAST_EXPLAIN_BOTH", 
+                on: { "trust+": 3 } 
+              },
+              { 
+                text: "(Zum Kunden) Unterschreiben Sie schnell, bevor er nein sagt.", 
+                ending: "fail", 
+                note: "Manipulation", 
+                on: { "trust-": 3 } 
+              },
+              { 
+                text: "(Zum Partner) Ihr Partner spart 360 € im Jahr. Wollen Sie das verhindern?", 
+                ending: "warn", 
+                note: "Passiv-aggressiv", 
+                on: { "trust-": 2 } 
+              }
+            ]
+          },
+
+          {
+            id: "FAST_EXPLAIN_BOTH",
+            speaker: "sales",
+            text: "Ablauf in 30 Sekunden: Anmeldung, Kündigungsfristen, Abschlag anpassen, alles schriftlich. Ich bleibe Ihr Ansprechpartner.\n\nPartner (zum Kunden): 'Was meinst du?'",
+            door: "open",
+            options: [
+              { 
+                text: "Kunde: 'Klingt gut. Machen wir.'", 
+                ending: "success", 
+                note: "Beide überzeugt", 
+                on: { "trust+": 3 } 
+              },
+              { 
+                text: "Kunde: 'Lass uns drüber schlafen.' → Spieler: 'Verstehe. Ich komme morgen 18:00 nochmal vorbei. 3 Minuten.'", 
+                ending: "success",
+                tag: "appointment",
+                note: "Termin vereinbart", 
+                on: { "trust+": 2 } 
+              },
+              { 
+                text: "Kunde: 'Lass uns drüber schlafen.' → Spieler: 'Wenn Sie jetzt nicht unterschreiben, ist das Angebot weg.'", 
+                ending: "warn", 
+                note: "Druckmasche", 
+                on: { "trust-": 3 } 
+              },
+              { 
+                text: "Partner: 'Wir brauchen das nicht.' → Spieler: 'Alles klar, verstehe. Hier meine Karte, falls Sie es sich anders überlegen.'", 
+                ending: "neutral" 
+              },
+              { 
+                text: "Partner: 'Wir brauchen das nicht.' → Spieler: 'Sie verschenken gerade 360 € pro Jahr.'", 
+                ending: "warn", 
+                note: "Aufdringlich", 
+                on: { "trust-": 2 } 
+              }
             ]
           }
         ]
@@ -1657,7 +1577,7 @@ const sfx = {
   bell:       document.getElementById('sfx-bell'),
   dooropen:   document.getElementById('sfx-dooropen'),
   doorclosed: document.getElementById('sfx-doorclosed'),
-  doorsound:  document.getElementById('sfx-doorsound'),  // NEU
+  doorsound:  document.getElementById('sfx-doorsound'),
   police:     document.getElementById('sfx-police'),
   success:    document.getElementById('sfx-success'),
   cat:        document.getElementById('sfx-cat'),
@@ -2131,17 +2051,11 @@ if(currentNode.autoRoute && id === 'NEIGHBOR_DECISION'){
     function chooseStartScenario(){
       const config = DIFFICULTY[selectedDifficulty];
       
-      // HARD: 30% Chance auf AGGRESSIVE_START
-      if(selectedDifficulty === 'HARD' && Math.random() < config.escalationChance){
-        showNode('AGGRESSIVE_START');
+      // NORMAL: 20% Chance auf Bestandskunden-Start
+      if(selectedDifficulty === 'NORMAL' && Math.random() < 0.20){
+        showNode('EXISTING_CUSTOMER_START');
         return;
       }
-
-// NORMAL: 20% Chance auf Bestandskunden-Start
-if(selectedDifficulty === 'NORMAL' && Math.random() < 0.20){
-  showNode('EXISTING_CUSTOMER_START');
-  return;
-}
 
       // Standard-Start für gewählten Modus
       showNode(currentTree.start);
@@ -2197,11 +2111,11 @@ if(selectedDifficulty === 'NORMAL' && Math.random() < 0.20){
       }
 
       if(waitingMode){
-        // Ungeduld-Eskalation bei NORMAL/HARD
-        if(selectedDifficulty !== 'EASY'){
+        // Ungeduld-Eskalation bei NORMAL (EASY ist toleranter)
+        if(selectedDifficulty === 'NORMAL'){
           if(openTimerId){ clearTimeout(openTimerId); openTimerId = null; }
           waitingMode = null; hideWait();
-          showBubble('Ich habe gesagt: Moment!'); // Verwendet Standard 1200ms
+          showBubble('Ich habe gesagt: Moment!');
           siren.classList.add('show'); playSfx('police', 0.9); setTimeout(()=> siren.classList.remove('show'), 1600);
           openDoor();
           srSpeak('Eskalation nach Drängeln.');
@@ -2222,21 +2136,20 @@ if(selectedDifficulty === 'NORMAL' && Math.random() < 0.20){
       }
     }
 
-document.querySelectorAll('.difficulty-btn').forEach(btn => {
-  btn.addEventListener('click', ()=>{
-    // unlockAudio(); // <- Diese Zeile entfernen, da es bereits beim ersten Klick passiert
-    const diff = btn.getAttribute('data-difficulty');
-    selectedDifficulty = diff;
-    difficultySelected = true;
-    
-    const config = DIFFICULTY[diff];
-    state.trust = config.trustStart;
-    updateTrustDisplay();
+    document.querySelectorAll('.difficulty-btn').forEach(btn => {
+      btn.addEventListener('click', ()=>{
+        const diff = btn.getAttribute('data-difficulty');
+        selectedDifficulty = diff;
+        difficultySelected = true;
+        
+        const config = DIFFICULTY[diff];
+        state.trust = config.trustStart;
+        updateTrustDisplay();
 
-    startOverlay.style.display = 'none';
-    srSpeak(`${config.label} gewählt. Klopfe ${config.maxKnocks}× zum Start.`);
-  });
-});
+        startOverlay.style.display = 'none';
+        srSpeak(`${config.label} gewählt. Klopfe ${config.maxKnocks}× zum Start.`);
+      });
+    });
 
     resetBtn.addEventListener('click', hardReset);
     playAgain.addEventListener('click', ()=>{ hardReset(); });
@@ -2246,8 +2159,9 @@ document.querySelectorAll('.difficulty-btn').forEach(btn => {
 
     function init(){ hardReset(); }
     init();
-      // Audio beim ersten Klick entsperren
-  document.addEventListener('click', unlockAudio, { once: true });
+    
+    // Audio beim ersten Klick entsperren
+    document.addEventListener('click', unlockAudio, { once: true });
   </script>
 </body>
 </html>
