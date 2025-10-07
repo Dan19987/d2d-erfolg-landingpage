@@ -383,7 +383,26 @@
       to{transform:translateY(0)}
     }
     
-    /* MOBILE OPTIMIZATIONS */
+    /* SCROLL ANIMATIONS */
+    .scroll-animate {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+    }
+    
+    .scroll-animate.animate-in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    /* Respektiere User-Präferenzen für reduzierte Bewegung */
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-animate {
+        opacity: 1;
+        transform: none;
+        transition: none;
+      }
+    }
     @media (max-width: 880px){
       .hero .wrap{grid-template-columns:1fr}
       .two,.three{grid-template-columns:1fr}
@@ -611,17 +630,17 @@
           <p class="lead">Erfolgreich im Haustürgeschäft: Lerne, wie du Ablehnung souverän meisterst, Einwände entkräftest und im D2D-Vertrieb mehr Abschlüsse erzielst. Ohne Tricks, mit erprobten Strategien aus über 10 Jahren Außendienst-Praxis.</p>
           
           <!-- Stats Counter -->
-          <div style="display:flex;gap:2.5rem;margin:2rem 0;flex-wrap:wrap;">
+          <div style="display:flex;gap:2.5rem;margin:2rem 0;flex-wrap:wrap;" id="statsCounter">
             <div style="text-align:left;">
-              <div style="font-size:2.5rem;font-weight:800;color:#4fc3f7;">250+</div>
+              <div style="font-size:2.5rem;font-weight:800;color:#4fc3f7;" data-target="250">0+</div>
               <div style="font-size:0.95rem;opacity:0.85;">Verträge pro Monat</div>
             </div>
             <div style="text-align:left;">
-              <div style="font-size:2.5rem;font-weight:800;color:#4fc3f7;">10+</div>
+              <div style="font-size:2.5rem;font-weight:800;color:#4fc3f7;" data-target="10">0+</div>
               <div style="font-size:0.95rem;opacity:0.85;">Jahre D2D-Praxis</div>
             </div>
             <div style="text-align:left;">
-              <div style="font-size:2.5rem;font-weight:800;color:#4fc3f7;">27</div>
+              <div style="font-size:2.5rem;font-weight:800;color:#4fc3f7;" data-target="27">0</div>
               <div style="font-size:0.95rem;opacity:0.85;">Verträge an einem Tag</div>
             </div>
           </div>
@@ -665,7 +684,7 @@
     <!-- PROBLEME / LÖSUNGEN -->
     <section id="kapitel" aria-labelledby="benefits-title">
       <div class="container grid two">
-        <div class="card">
+        <div class="card scroll-animate">
           <h3 class="section-title" style="font-size:1.3rem">Die Probleme im Door-to-Door Vertrieb</h3>
           <ul class="clean">
             <li><span class="dot"></span><span>Ständige Neins und verschlossene Türen im Außendienst</span></li>
@@ -675,7 +694,7 @@
             <li><span class="dot"></span><span>Ablehnung bei der Kaltakquise überwinden</span></li>
           </ul>
         </div>
-        <div class="card">
+        <div class="card scroll-animate">
           <h3 class="section-title" style="font-size:1.3rem">Die Lösungen aus 10+ Jahren D2D-Praxis</h3>
           <ul class="clean">
             <li><span class="dot"></span><span>Authentische Storys aus über 10 Jahren Door-to-Door Vertrieb</span></li>
@@ -699,7 +718,7 @@
 
     <!-- KLAPPENTEXT -->
     <section aria-labelledby="quote-title">
-      <div class="container card quote">
+      <div class="container card quote scroll-animate">
         <h2 id="quote-title" class="section-title">Worum es wirklich geht im Door-to-Door Vertrieb</h2>
         <blockquote>
           <p><strong>Door‑to‑Door ist das härteste Geschäft der Welt</strong> – und die ehrlichste Schule des Verkaufens. Daniel Lahmer hat in über zehn Jahren <strong>Außendienst</strong> unzählige Neins kassiert – und trotzdem Rekorde gebrochen. Ohne Tricks, ohne Manipulation, dafür mit Klarheit, Ausdauer und Respekt. Dieses <strong>D2D-Buch</strong> ist kein Theorie‑Geschwätz, sondern ein Praxisleitfaden voller echter Geschichten und <strong>Verkaufsstrategien</strong>, die dich stärker machen – im <strong>Direktvertrieb</strong> und im Leben.</p>
@@ -773,7 +792,7 @@
 
     <!-- AUTOR -->
     <section id="autor" aria-labelledby="autor-title">
-      <div class="container card">
+      <div class="container card scroll-animate">
         <div class="author">
           <img src="/assets/autor.jpg" alt="Daniel Lahmer – D2D Vertriebsexperte und Autor mit über 10 Jahren Außendienst-Erfahrung" loading="lazy" />
           <div>
@@ -789,7 +808,7 @@
 
     <!-- CTA BIG -->
     <section aria-label="Kaufaufforderung Door-to-Door Buch">
-      <div class="container cta-big">
+      <div class="container cta-big scroll-animate">
         <h3>Bereit, im Door-to-Door Vertrieb zu gewinnen?</h3>
         <p class="muted" style="color:#e6f3f2">Hol dir den D2D-Leitfaden für den Außendienst, der funktioniert, wenn andere aufgeben.</p>
         <p style="margin:0.6rem 0 0.2rem"><a class="cta" href="https://www.amazon.de/dp/DEINE-ASIN" target="_blank" rel="noopener">Jetzt bei Amazon bestellen</a></p>
@@ -876,7 +895,7 @@
         <a href="#top">Nach oben</a>
         <a href="/impressum.html">Impressum</a>
         <a href="/datenschutz.html">Datenschutz</a>
-        <a href="kontakt.html">Kontakt</a>
+        <a href="/kontakt.html">Kontakt</a>
       </div>
     </div>
   </footer>
@@ -1078,6 +1097,98 @@
       msg.style.color = ok ? '#065f46' : '#991b1b';
       msg.textContent = text;
     }
+  })();
+  </script>
+
+  <!-- SCROLL ANIMATIONS JAVASCRIPT -->
+  <script>
+  (function() {
+    // Intersection Observer für Scroll-Animationen
+    const scrollObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-in');
+          scrollObserver.unobserve(entry.target); // Performance: Nur einmal animieren
+        }
+      });
+    }, {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    });
+    
+    // Scroll-Animationen initialisieren
+    function initScrollAnimations() {
+      const animateElements = document.querySelectorAll('.scroll-animate');
+      
+      animateElements.forEach((element, index) => {
+        // Gestaffelter Start für visuellen Effekt
+        element.style.transitionDelay = `${index * 0.1}s`;
+        scrollObserver.observe(element);
+      });
+    }
+    
+    // Starten wenn DOM geladen
+    document.addEventListener('DOMContentLoaded', initScrollAnimations);
+  })();
+  </script>
+
+  <!-- STATS COUNTER ANIMATION -->
+  <script>
+  (function() {
+    function animateCounter(element, target, duration = 2000) {
+      const start = 0;
+      const increment = target / (duration / 16);
+      let current = start;
+      
+      const timer = setInterval(() => {
+        current += increment;
+        if (current >= target) {
+          current = target;
+          clearInterval(timer);
+        }
+        
+        // Bestimme Suffix basierend auf dem target
+        let suffix = '';
+        if (target === 250 || target === 10) {
+          suffix = '+';
+        }
+        
+        element.textContent = Math.floor(current) + suffix;
+      }, 16);
+    }
+    
+    function startCounterAnimation() {
+      const counters = document.querySelectorAll('#statsCounter [data-target]');
+      
+      counters.forEach((counter, index) => {
+        const target = parseInt(counter.getAttribute('data-target'));
+        // Gestaffelter Start für visuellen Effekt
+        setTimeout(() => {
+          animateCounter(counter, target, 2500);
+        }, index * 200);
+      });
+    }
+    
+    // Intersection Observer für Animation beim ersten Sichtbarwerden
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          startCounterAnimation();
+          observer.unobserve(entry.target); // Nur einmal animieren
+        }
+      });
+    }, {
+      threshold: 0.5,
+      rootMargin: '0px 0px -100px 0px'
+    });
+    
+    // Observer starten wenn DOM geladen
+    document.addEventListener('DOMContentLoaded', () => {
+      const statsSection = document.getElementById('statsCounter');
+      if (statsSection) {
+        observer.observe(statsSection);
+      }
+    });
   })();
   </script>
 
