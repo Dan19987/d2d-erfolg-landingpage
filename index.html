@@ -849,6 +849,11 @@
         if (res.ok && data.success) {
           showMsg('✓ ' + (data.message || 'Erfolgreich angemeldet!'), true);
           form.reset();
+          // Analytics Event: Warteliste-Anmeldung
+          window.trackEvent('waitlist_signup', {
+            'source': 'homepage',
+            'email_domain': email.split('@')[1]
+          });
         } else {
           throw new Error(data.message || 'Fehler. Bitte erneut versuchen.');
         }
@@ -869,27 +874,144 @@
   })();
   </script>
 
+  <!-- GOOGLE ANALYTICS 4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-NV9PRGSVHG"></script>
+  <script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  
+  // Standard-Einstellungen
+  gtag('js', new Date());
+  gtag('config', 'G-NV9PRGSVHG', {
+    'anonymize_ip': true,
+    'cookie_flags': 'SameSite=None;Secure'
+  });
+
+  // Custom Events Helper
+  window.trackEvent = function(eventName, params) {
+    if (typeof gtag === 'function') {
+      gtag('event', eventName, params || {});
+    }
+  };
+  </script>
+
   <!-- COOKIE CONSENT JAVASCRIPT -->
   <script>
   (function() {
     const banner = document.getElementById('cookie-consent');
     const consent = localStorage.getItem('cookieConsent');
 
+    // Analytics nur laden wenn zugestimmt
     if (!consent) {
       banner.style.display = 'block';
+      // GA4 pausieren bis Zustimmung
+      window['ga-disable-G-NV9PRGSVHG'] = true;
     } else if (consent === 'accepted') {
-      // Hier später Analytics-Code einfügen
+      window['ga-disable-G-NV9PRGSVHG'] = false;
+    } else if (consent === 'declined') {
+      window['ga-disable-G-NV9PRGSVHG'] = true;
     }
 
     window.acceptCookies = function() {
       localStorage.setItem('cookieConsent', 'accepted');
       banner.style.display = 'none';
+      window['ga-disable-G-NV9PRGSVHG'] = false;
+      // Analytics neu initialisieren
+      gtag('consent', 'update', {
+        'analytics_storage': 'granted'
+      });
     };
 
     window.declineCookies = function() {
       localStorage.setItem('cookieConsent', 'declined');
       banner.style.display = 'none';
+      window['ga-disable-G-NV9PRGSVHG'] = true;
+      gtag('consent', 'update', {
+        'analytics_storage': 'denied'
+      });
     };
+  })();
+  </script>
+
+  <!-- EVENT TRACKING -->
+  <script>
+  (function() {
+    // 1. AMAZON-KLICKS (Wichtigste Conversion!)
+    document.addEventListener('click', function(e) {
+      const link = e.target.closest('a[href*="amazon.de"]');
+      if (link) {
+        window.trackEvent('amazon_click', {
+          'button_location': link.textContent.trim(),
+          'link_url': link.href
+        });
+      }
+    });
+
+    // 2. LESEPROBE-DOWNLOADS
+    document.addEventListener('click', function(e) {
+      const link = e.target.closest('a[href*="leseprobe.pdf"]');
+      if (link) {
+        window.trackEvent('leseprobe_download', {
+          'download_type': link.hasAttribute('download') ? 'download' : 'view'
+        });
+      }
+    });
+
+    // 3. TÜRSPIEL-START
+    const originalOpenGameModal = window.openGameModal;
+    window.openGameModal = function() {
+      window.trackEvent('game_start', {
+        'game_name': 'tuerspiel'
+      });
+      if (originalOpenGameModal) originalOpenGameModal();
+    };
+
+    // 4. SCROLL-TIEFE
+    let scrollMarkers = {25: false, 50: false, 75: false, 100: false};
+    window.addEventListener('scroll', function() {
+      const scrollPercent = Math.round((window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100);
+      
+      Object.keys(scrollMarkers).forEach(marker => {
+        if (scrollPercent >= marker && !scrollMarkers[marker]) {
+          scrollMarkers[marker] = true;
+          window.trackEvent('scroll_depth', {
+            'percent_scrolled': marker
+          });
+        }
+      });
+    });
+
+    // 5. NAVIGATION-KLICKS
+    document.addEventListener('click', function(e) {
+      const navLink = e.target.closest('nav a, .brand a');
+      if (navLink && navLink.getAttribute('href').startsWith('#')) {
+        window.trackEvent('navigation_click', {
+          'link_text': navLink.textContent.trim(),
+          'destination': navLink.getAttribute('href')
+        });
+      }
+    });
+
+    // 6. EXTERNE LINKS (Social Media, etc.)
+    document.addEventListener('click', function(e) {
+      const link = e.target.closest('a[href^="http"]');
+      if (link && !link.href.includes(window.location.hostname) && !link.href.includes('amazon.de')) {
+        window.trackEvent('external_link_click', {
+          'link_url': link.href,
+          'link_text': link.textContent.trim()
+        });
+      }
+    });
+
+    // 7. FAQ-INTERAKTIONEN
+    document.addEventListener('toggle', function(e) {
+      if (e.target.tagName === 'DETAILS') {
+        window.trackEvent('faq_interaction', {
+          'faq_question': e.target.querySelector('summary').textContent.trim(),
+          'action': e.target.open ? 'open' : 'close'
+        });
+      }
+    });
   })();
   </script>
 
