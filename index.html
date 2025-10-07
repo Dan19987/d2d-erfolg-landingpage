@@ -62,17 +62,57 @@
     .lead{font-size:1.1rem;opacity:.95}
     .hero .actions{display:flex;gap:1rem;flex-wrap:wrap;margin-top:1.4rem}
     
-    /* 3D Book */
-    .book-3d{width:280px;height:380px;background:linear-gradient(145deg, #2c5f5a, #1a4944);border-radius:12px;box-shadow:20px 20px 40px rgba(0,0,0,0.3), -10px -10px 20px rgba(255,255,255,0.1);position:relative;transform:perspective(1000px) rotateY(-15deg) rotateX(2deg);transition:transform .3s ease;}
-    .book-3d:hover{transform:perspective(1000px) rotateY(-10deg) rotateX(0deg);}
-    .book-stamp{position:absolute;bottom:10px;right:10px;background:white;padding:4px 8px;border-radius:6px;font-size:.7rem;font-weight:700;color:var(--accent);box-shadow:0 2px 8px rgba(0,0,0,0.15);}
+    /* Video Container */
+    .video-container{
+      position:relative;
+      max-width:500px;
+      width:100%;
+      border-radius:var(--radius);
+      overflow:hidden;
+      box-shadow:20px 20px 40px rgba(0,0,0,0.3), -5px -5px 20px rgba(255,255,255,0.08);
+      background:#0f172a;
+    }
+    .video-container video{
+      width:100%;
+      height:auto;
+      display:block;
+    }
+    .video-stamp{
+      position:absolute;
+      bottom:15px;
+      left:15px;
+      background:white;
+      padding:6px 12px;
+      border-radius:8px;
+      font-size:.75rem;
+      font-weight:700;
+      color:var(--accent);
+      box-shadow:0 4px 12px rgba(0,0,0,0.2);
+      z-index:10;
+    }
     
     /* SECTIONS */
     section{padding:clamp(2rem, 4vw, 4rem) 0}
     .grid{display:grid;gap:1.25rem}
     .two{grid-template-columns:repeat(2,1fr)}
     .three{grid-template-columns:repeat(3,1fr)}
-    @media (max-width: 880px){.hero .wrap{grid-template-columns:1fr}.two,.three{grid-template-columns:1fr}}
+    @media (max-width: 880px){
+      .hero .wrap{grid-template-columns:1fr}
+      .two,.three{grid-template-columns:1fr}
+      .video-container{
+        max-width:400px;
+        margin:0 auto;
+      }
+    }
+    @media (max-width: 640px){
+      .video-container{
+        max-width:100%;
+      }
+      .video-container video{
+        max-height:380px;
+        object-fit:contain;
+      }
+    }
     
     .card{background:var(--paper);border-radius:var(--radius);box-shadow:var(--shadow);padding:1.25rem}
     .section-title{font-size:clamp(1.6rem, 1.2rem + .8vw, 2rem);margin:0 0 .6rem}
@@ -103,7 +143,7 @@
     .cta-big{display:grid;place-items:center;background:linear-gradient(145deg, var(--door-green), var(--door-green-2));color:#fff;padding:2rem;border-radius:var(--radius);text-align:center}
     .cta-big h3{margin:.2rem 0 1rem}
 
-    /* INTERAKTIVES TRAINING - HERO STYLE */
+    /* INTERAKTIVES TRAINING */
     .game-section{
       background:linear-gradient(145deg, color-mix(in oklab, var(--door-green) 78%, #0a0 0%), var(--door-green-2));
       color:white;
@@ -210,13 +250,11 @@
       filter:saturate(120%) brightness(1.05);
     }
     
-    /* Pulse Animation */
     @keyframes pulse{
       0%, 100%{filter:saturate(100%) brightness(1)}
       50%{filter:saturate(120%) brightness(1.05)}
     }
     
-    /* Responsive */
     @media (max-width: 880px){
       .game-section .wrap{
         grid-template-columns:1fr;
@@ -308,7 +346,6 @@
       border:none;
     }
     
-    /* Mobile: Fullscreen */
     @media (max-width: 768px){
       .game-modal{
         padding:0;
@@ -467,7 +504,7 @@
   </header>
 
   <main id="top">
-    <!-- HERO -->
+    <!-- HERO mit VIDEO -->
     <section class="hero">
       <div class="container wrap">
         <div>
@@ -496,13 +533,23 @@
             <a class="cta secondary" href="#leseprobe">Leseprobe</a>
           </div>
         </div>
-        <div>
-          <!-- 3D Book Mockup -->
-          <div style="display:flex;justify-content:center;align-items:center;">
-            <div class="book-3d">
-              <img src="/assets/Cover-final.JPEG" alt="Buchcover: Vertreterbesuch unerwünscht – Daniel Lahmer" style="position:absolute;inset:15px;border-radius:8px;width:calc(100% - 30px);height:calc(100% - 30px);object-fit:cover;">
-              <div class="book-stamp">Neu · 1. Auflage</div>
-            </div>
+        
+        <!-- VIDEO statt 3D Book -->
+        <div style="display:flex;justify-content:center;align-items:center;">
+          <div class="video-container">
+            <video 
+              autoplay 
+              loop 
+              muted 
+              playsinline
+              preload="metadata"
+              poster="/assets/cover-poster.jpg"
+              aria-label="Buchtrailer: Vertreterbesuch unerwünscht"
+            >
+              <source src="/assets/book-trailer-720p.mp4" type="video/mp4">
+              <!-- Fallback für Browser ohne Video-Support -->
+              <img src="/assets/Cover-final.JPEG" alt="Buchcover: Vertreterbesuch unerwünscht – Daniel Lahmer" style="width:100%">
+            </video>
           </div>
         </div>
       </div>
@@ -586,19 +633,17 @@
       </div>
     </section>
 
-    <!-- INTERAKTIVES TRAINING - HERO STYLE -->
+    <!-- INTERAKTIVES TRAINING -->
     <section aria-label="Interaktives Training" class="game-section">
       <div class="container">
         <div class="wrap">
-          <!-- Links: Große Tür mit NEU Badge -->
           <div class="door-visual">
             <div class="door-container">
-              <div class="big-door">🚪</div>
+              <img src="/assets/vorschaubild.webp" alt="D2D Türspiel Vorschau" style="max-width:100%;height:auto;border-radius:12px;box-shadow:0 20px 40px rgba(0,0,0,0.3);">
               <div class="new-badge">NEU</div>
             </div>
           </div>
           
-          <!-- Rechts: Content -->
           <div>
             <div class="kicker">🎯 INTERAKTIVES TRAINING</div>
             
@@ -606,7 +651,6 @@
             
             <p>Realistische Verkaufssituationen direkt im Browser. Triff die richtigen Entscheidungen, meistere Einwände und schließe ab – ohne Risiko, mit sofortigem Feedback.</p>
             
-            <!-- Benefits -->
             <ul class="benefits">
               <li>
                 <span class="check">✓</span>
@@ -622,7 +666,6 @@
               </li>
             </ul>
             
-            <!-- CTA Button -->
             <button class="cta-game" onclick="openGameModal()">
               <span>🎮 Jetzt Training starten</span>
             </button>
@@ -672,7 +715,6 @@
           <h3 class="section-title" style="font-size:1.2rem">Warteliste</h3>
           <p>Trag dich ein und erhalte frühen Zugriff sowie Bonusmaterial.</p>
           
-          <!-- FORMULAR -->
           <form id="waitlistForm" style="display:grid;gap:.6rem">
             <label for="email" class="muted">E-Mail</label>
             <input 
@@ -724,8 +766,7 @@
           <summary>Gibt es digitale Vorlagen?</summary>
           <p>Ja, Bonusmaterial folgt per E‑Mail/Downloadbereich. Trag dich in die Warteliste ein.</p>
         </details>
-      </div>
-    </section>
+      </section>
   </main>
 
   <footer>
@@ -834,19 +875,15 @@
     const banner = document.getElementById('cookie-consent');
     const consent = localStorage.getItem('cookieConsent');
 
-    // Zeige Banner nur, wenn noch keine Entscheidung getroffen wurde
     if (!consent) {
       banner.style.display = 'block';
     } else if (consent === 'accepted') {
       // Hier später Analytics-Code einfügen
-      // loadAnalytics();
     }
 
     window.acceptCookies = function() {
       localStorage.setItem('cookieConsent', 'accepted');
       banner.style.display = 'none';
-      // Hier später Analytics-Code einfügen
-      // loadAnalytics();
     };
 
     window.declineCookies = function() {
@@ -874,22 +911,18 @@
       document.documentElement.style.overflow = '';
     }
 
-    // Hash-Support für Direktlink
     if (window.location.hash === '#spiel') {
       openGameModal();
     }
 
-    // Overlay-Click schließt Modal
     modal.addEventListener('click', (e)=>{
       if(e.target === modal) closeGameModal();
     });
 
-    // ESC-Taste zum Schließen
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') closeGameModal();
     });
 
-    // Global verfügbar machen
     window.openGameModal = openGameModal;
     window.closeGameModal = closeGameModal;
   })();
