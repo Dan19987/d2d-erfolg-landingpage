@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Impressum – D2D-Erfolg | Daniel Lahmer</title>
   <meta name="robots" content="noindex,nofollow" />
-  <link rel="icon" href="/assets/favicon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
   <style>
     :root{
       --door-green:#1c6e6a;
@@ -26,7 +26,6 @@
     header{position:sticky;top:0;backdrop-filter:saturate(150%) blur(8px);background:color-mix(in oklab, var(--paper) 70%, transparent);border-bottom:1px solid #e5e7eb;z-index:50}
     .nav{display:flex;align-items:center;justify-content:space-between;padding:.9rem 0;max-width:1120px;margin:0 auto;padding-left:20px;padding-right:20px;}
     .brand{display:flex;gap:.75rem;align-items:center}
-    .brand .dot{width:14px;height:14px;border-radius:50%;background:var(--accent)}
     .brand strong{letter-spacing:.2px}
     .content{background:var(--paper);border-radius:var(--radius);box-shadow:var(--shadow);padding:2.5rem;}
     h1{font-size:2.2rem;margin:0 0 1.5rem;color:var(--door-green)}
@@ -42,15 +41,14 @@
 <body>
   <header>
     <div class="nav">
-      <a href="/" class="brand">
-        <span class="dot"></span>
-        <strong>D2D‑Erfolg</strong>
+      <a href="/" class="brand" aria-label="D2D-Erfolg Startseite">
+        <img src="/assets/d2d-logo.png" alt="D2D-Erfolg Logo" style="height:40px;width:auto;">
       </a>
       <a href="/" style="color:var(--door-green);font-weight:600">← Zurück zur Startseite</a>
     </div>
   </header>
 
- <main>
+  <main>
     <div class="container">
       <div class="content">
         <h1>Impressum</h1>
@@ -59,7 +57,7 @@
         <p>
           <strong>Daniel Lahmer</strong><br>
           D2D-Erfolg<br>
-          (Postfach: wird nachgereicht)
+          <span style="color:#ffc107;font-weight:600;">[POSTFACH-ADRESSE HIER EINTRAGEN]</span>
         </p>
 
         <h2>Kontakt</h2>
@@ -70,7 +68,7 @@
         <h2>Redaktionell verantwortlich</h2>
         <p>
           Daniel Lahmer<br>
-          (Postfach: wird nachgereicht)
+          <span style="color:#ffc107;font-weight:600;">[POSTFACH-ADRESSE HIER EINTRAGEN]</span>
         </p>
 
         <h2>Haftung für Inhalte</h2>
@@ -89,6 +87,19 @@
         <h2>Urheberrecht</h2>
         <p>
           Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen dem deutschen Urheberrecht. Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechtes bedürfen der schriftlichen Zustimmung des jeweiligen Autors bzw. Erstellers.
+        </p>
+
+        <h2>Online-Streitbeilegung (OS)</h2>
+        <p>
+          Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit:<br>
+          <a href="https://ec.europa.eu/consumers/odr/" target="_blank" rel="noopener">https://ec.europa.eu/consumers/odr/</a>
+        </p>
+        <p>
+          Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.
+        </p>
+
+        <p style="margin-top:3rem;padding-top:2rem;border-top:1px solid #e0e0e0;color:var(--muted);font-size:0.9rem">
+          <strong>Stand:</strong> Oktober 2025
         </p>
       </div>
     </div>
