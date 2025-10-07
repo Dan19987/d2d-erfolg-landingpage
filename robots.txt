@@ -1,0 +1,13 @@
+# robots.txt für d2d-erfolg.de
+# Optimiert für SEO
+
+# Alle Bots erlauben (Google, Bing, etc.)
+User-agent: *
+Allow: /
+
+# Sitemap-Standort für Suchmaschinen
+Sitemap: https://d2d-erfolg.de/sitemap.xml
+
+# Optional: Spezifische Verzeichnisse ausschließen (falls vorhanden)
+# Disallow: /admin/
+# Disallow: /temp/
