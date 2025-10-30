@@ -506,9 +506,21 @@
     order: 1;
     text-align: center;
   }
+  
+  /* Schulungsvideo auf Tablet */
+  section[aria-labelledby="schulung-title"] .wrap {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
 }
 
 @media (max-width: 640px) {
+  /* Schulungsvideo: Max-Height auf Mobile */
+  section[aria-labelledby="schulung-title"] video {
+    max-height: 500px;
+    object-fit: contain;
+  }
+  
   /* Timestamps kompakter auf Mobile */
   section[aria-labelledby="brandsong-title"] .card > div {
     font-size: 0.8rem;
@@ -897,15 +909,16 @@ video:not([data-loaded]) {
       <img src="/assets/d2d-logo.png" alt="D2D-Erfolg Logo - Door-to-Door Vertrieb lernen" style="height:50px;width:auto;">
     </a>
     
-    <!-- Desktop Navigation -->
-    <nav class="desktop-nav" aria-label="Hauptnavigation">
-      <a href="#kapitel">Das Buch</a>
-      <a href="#brandsong-title">Der Song</a>
-      <a href="#autor">Autor</a>
-      <a href="#kurse">Kurse</a>
-      <a href="#brand-title">Über uns</a>
-      <a class="cta" href="https://www.amazon.de/dp/DEINE-ASIN" target="_blank" rel="noopener noreferrer">📖 Jetzt kaufen</a>
-    </nav>
+<!-- Desktop Navigation -->
+<nav class="desktop-nav" aria-label="Hauptnavigation">
+  <a href="#kapitel">Das Buch</a>
+  <a href="#schulung-title">Video</a>
+  <a href="#brandsong-title">Der Song</a>
+  <a href="#autor">Autor</a>
+  <a href="#kurse">Kurse</a>
+  <a href="#brand-title">Über uns</a>
+  <a class="cta" href="https://www.amazon.de/dp/DEINE-ASIN" target="_blank" rel="noopener noreferrer">📖 Jetzt kaufen</a>
+</nav>
     
     <!-- Mobile Hamburger Button (RECHTS) -->
     <button class="mobile-menu-btn" aria-label="Menü öffnen" onclick="toggleMobileMenu()">
@@ -924,19 +937,20 @@ video:not([data-loaded]) {
         <img src="/assets/d2d-logo.png" alt="D2D-Erfolg Logo" style="height:60px;width:auto;">
       </div>
       
-      <nav class="mobile-nav-links">
-        <a href="#kapitel" onclick="toggleMobileMenu()">📖 Das Buch</a>
-        <a href="#brandsong-title" onclick="toggleMobileMenu()">🎵 Der Song</a>
-        <a href="#autor" onclick="toggleMobileMenu()">👨‍💼 Autor</a>
-        <a href="#kurse" onclick="toggleMobileMenu()">🎓 Kurse</a>
-        <a href="#brand-title" onclick="toggleMobileMenu()">🎯 Über uns</a>
-        
-        <div class="mobile-cta-section">
-          <a class="mobile-cta" href="https://www.amazon.de/dp/DEINE-ASIN" target="_blank" rel="noopener noreferrer">
-            📖 Jetzt kaufen
-          </a>
-        </div>
-      </nav>
+<nav class="mobile-nav-links">
+  <a href="#kapitel" onclick="toggleMobileMenu()">📖 Das Buch</a>
+  <a href="#schulung-title" onclick="toggleMobileMenu()">🎥 Video</a>
+  <a href="#brandsong-title" onclick="toggleMobileMenu()">🎵 Der Song</a>
+  <a href="#autor" onclick="toggleMobileMenu()">👨‍💼 Autor</a>
+  <a href="#kurse" onclick="toggleMobileMenu()">🎓 Kurse</a>
+  <a href="#brand-title" onclick="toggleMobileMenu()">🎯 Über uns</a>
+  
+  <div class="mobile-cta-section">
+    <a class="mobile-cta" href="https://www.amazon.de/dp/DEINE-ASIN" target="_blank" rel="noopener noreferrer">
+      📖 Jetzt kaufen
+    </a>
+  </div>
+</nav>
     </div>
   </div>
 </header>
@@ -1133,6 +1147,80 @@ video:not([data-loaded]) {
         </blockquote>
       </div>
     </section>
+
+<!-- SCHULUNGSVIDEO SECTION -->
+<!-- Diese Section zwischen Klappentext und Leseprobe einfügen -->
+<section aria-labelledby="schulung-title" class="game-section" style="margin: 4rem 0;">
+  <div class="container">
+    <div class="wrap">
+      
+      <!-- Text-Bereich -->
+      <div>
+        <div class="kicker">🎥 KOSTENFREIES SCHULUNGSVIDEO</div>
+        
+        <h2 id="schulung-title">5 D2D-Techniken in 13 Minuten</h2>
+        
+        <p>Von der KKRH-Methode bis zur Anti-Storno-Schleife: Lerne die wichtigsten Verkaufstechniken für erfolgreichen Door-to-Door Vertrieb. Praxisnah, direkt anwendbar, ohne Bullshit.</p>
+        
+        <!-- Benefits -->
+        <ul class="benefits">
+          <li>
+            <span class="check">✓</span>
+            <span>KKRH-Methode für 30% mehr Türöffnungen</span>
+          </li>
+          <li>
+            <span class="check">✓</span>
+            <span>Vom Nein zum Ja in wenigen Minuten</span>
+          </li>
+          <li>
+            <span class="check">✓</span>
+            <span>Kundentypen sofort erkennen & richtig reagieren</span>
+          </li>
+          <li>
+            <span class="check">✓</span>
+            <span>Gießkannen-Prinzip für systematischen Erfolg</span>
+          </li>
+          <li>
+            <span class="check">✓</span>
+            <span>Anti-Storno-Schleife für 50% weniger Widerrufe</span>
+          </li>
+        </ul>
+        
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.4rem;">
+          <a class="cta" href="https://www.amazon.de/dp/DEINE-ASIN" target="_blank" rel="noopener">
+            📖 Buch mit allen 50+ Techniken
+          </a>
+          <a class="cta secondary" href="#kurse" style="font-size: 0.95rem;">
+            Videokurs-Warteliste →
+          </a>
+        </div>
+      </div>
+      
+<!-- Video-Bereich -->
+<div style="display: flex; justify-content: center; align-items: center;">
+  <div style="position: relative; padding-bottom: 177.78%; height: 0; overflow: hidden; max-width: 450px; width: 100%; border-radius: var(--radius); box-shadow: 20px 20px 40px rgba(0,0,0,0.3), -5px -5px 20px rgba(255,255,255,0.08); background: #0f172a;">
+    <iframe 
+      style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: var(--radius);"
+      src="https://www.youtube.com/embed/DEINE-VIDEO-ID?rel=0&modestbranding=1"
+      title="D2D Schulungsvideo: 5 Techniken"
+      frameborder="0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowfullscreen
+      id="schulungsvideo"
+    ></iframe>
+  </div>
+</div>
+      
+    </div>
+    
+<div style="text-align: center; margin-top: 2rem;">
+  <p style="font-size: 0.9rem; opacity: 0.8; color: white;">
+    💪 <strong>Praxiswissen, das funktioniert.</strong> 
+    Mehr D2D-Content gibt's im Buch und im kommenden Videokurs.
+  </p>
+</div>
+  </div>
+</section>
 
     <!-- LESEPROBE -->
     <section id="leseprobe" aria-labelledby="leseprobe-title">
@@ -1930,6 +2018,39 @@ video:not([data-loaded]) {
           window.trackEvent && window.trackEvent('video_play', {
             'video_name': 'logo_animation',
             'video_type': 'autoplay_loop'
+          });
+        });
+      }
+      // Schulungsvideo Tracking
+      const schulungVideo = document.getElementById('schulungsvideo');
+      
+      if (schulungVideo) {
+        let quartileTracked = {25: false, 50: false, 75: false, 100: false};
+        
+        schulungVideo.addEventListener('play', () => {
+          window.trackEvent && window.trackEvent('video_play', {
+            'video_name': 'schulungsvideo',
+            'video_duration': schulungVideo.duration
+          });
+        });
+        
+        schulungVideo.addEventListener('timeupdate', () => {
+          const progress = (schulungVideo.currentTime / schulungVideo.duration) * 100;
+          
+          Object.keys(quartileTracked).forEach(quartile => {
+            if (progress >= quartile && !quartileTracked[quartile]) {
+              quartileTracked[quartile] = true;
+              window.trackEvent && window.trackEvent('video_progress', {
+                'video_name': 'schulungsvideo',
+                'progress_percent': quartile
+              });
+            }
+          });
+        });
+        
+        schulungVideo.addEventListener('ended', () => {
+          window.trackEvent && window.trackEvent('video_complete', {
+            'video_name': 'schulungsvideo'
           });
         });
       }
