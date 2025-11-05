@@ -1163,7 +1163,7 @@ video:not([data-loaded]) {
         
         <p>Von der KKRH-Methode bis zur Anti-Storno-Schleife: Lerne die wichtigsten Verkaufstechniken für erfolgreichen Door-to-Door Vertrieb. Praxisnah, direkt anwendbar, ohne Bullshit.</p>
         
-        <!-- Benefits -->
+<!-- Benefits -->
         <ul class="benefits">
           <li>
             <span class="check">✓</span>
@@ -1197,32 +1197,49 @@ video:not([data-loaded]) {
         </div>
       </div>
       
-<!-- Video-Bereich -->
-<div style="display: flex; justify-content: center; align-items: center;">
-  <div style="position: relative; padding-bottom: 177.78%; height: 0; overflow: hidden; max-width: 450px; width: 100%; border-radius: var(--radius); box-shadow: 20px 20px 40px rgba(0,0,0,0.3), -5px -5px 20px rgba(255,255,255,0.08); background: #0f172a;">
-    <iframe 
-      style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: var(--radius);"
-      src="https://www.youtube.com/embed/2m6IJSyKTek?rel=0&modestbranding=1"
-      title="D2D Schulungsvideo: 5 Techniken"
-      frameborder="0"
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-      allowfullscreen
-      id="schulungsvideo"
-    ></iframe>
-  </div>
-</div>
+      <!-- Video-Bereich -->
+      <div style="display: flex; justify-content: center; align-items: center;">
+        <div style="position: relative; padding-bottom: 177.78%; height: 0; overflow: hidden; max-width: 450px; width: 100%; border-radius: var(--radius); box-shadow: 20px 20px 40px rgba(0,0,0,0.3), -5px -5px 20px rgba(255,255,255,0.08); background: #0f172a;">
+          
+          <!-- Custom Thumbnail Overlay -->
+          <div id="videoPreview" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('/assets/schulungsvideo-thumbnail.jpg'); background-size: cover; background-position: center; cursor: pointer; border-radius: var(--radius); z-index: 2;">
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.7); border-radius: 50%; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;">
+              <span style="color: white; font-size: 30px;">▶</span>
+            </div>
+          </div>
+          
+          <!-- YouTube iframe (hidden initially) -->
+          <iframe 
+            id="schulungsvideo"
+            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: var(--radius); display: none;"
+            src=""
+            title="D2D Schulungsvideo: 5 Techniken"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
       
     </div>
     
-<div style="text-align: center; margin-top: 2rem;">
-  <p style="font-size: 0.9rem; opacity: 0.8; color: white;">
-    💪 <strong>Praxiswissen, das funktioniert.</strong> 
-    Mehr D2D-Content gibt's im Buch und im kommenden Videokurs.
-  </p>
-</div>
+    <div style="text-align: center; margin-top: 2rem;">
+      <p style="font-size: 0.9rem; opacity: 0.8; color: white;">
+        💪 <strong>Praxiswissen, das funktioniert.</strong> 
+        Mehr D2D-Content gibt's im Buch und im kommenden Videokurs.
+      </p>
+    </div>
   </div>
 </section>
 
+<script>
+document.getElementById('videoPreview').addEventListener('click', function() {
+  const iframe = document.getElementById('schulungsvideo');
+  iframe.src = "https://www.youtube.com/embed/2m6IJSyKTek?rel=0&modestbranding=1&autoplay=1";
+  iframe.style.display = 'block';
+  this.style.display = 'none';
+});
+</script>
     <!-- LESEPROBE -->
     <section id="leseprobe" aria-labelledby="leseprobe-title">
       <div class="container grid two">
