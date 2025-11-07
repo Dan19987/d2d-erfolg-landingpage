@@ -998,24 +998,32 @@ video:not([data-loaded]) {
   </a>
 </div>
         </div>
-        
-        <!-- VIDEO -->
-        <div style="display:flex;justify-content:center;align-items:center;">
-          <div class="video-container">
-            <video 
-              autoplay 
-              loop 
-              muted 
-              playsinline
-              preload="metadata"
-              poster="/assets/cover-poster.jpg"
-              aria-label="Buchtrailer: Vertreterbesuch unerwünscht - Door-to-Door Vertrieb meistern"
-            >
-              <source src="/assets/book-trailer-720p.mp4" type="video/mp4">
-              <img src="/assets/Cover-final.JPEG" alt="Buchcover: Vertreterbesuch unerwünscht – D2D Vertrieb Buch von Daniel Lahmer" style="width:100%">
-            </video>
-          </div>
-        </div>
+
+<!-- VIDEO -->
+<div style="display:flex;justify-content:center;align-items:center;">
+  <div class="video-container" style="position:relative;">
+    
+    <!-- Badge über dem Video -->
+    <img 
+      src="/assets/badge.webp" 
+      alt="#2 Amazon New Release Bestseller Badge" 
+      style="position:absolute; top:15px; right:15px; width:80px; height:auto; z-index:10; border-radius:50%;"
+    />
+    
+    <video 
+      autoplay 
+      loop 
+      muted 
+      playsinline
+      preload="metadata"
+      poster="/assets/cover-poster.jpg"
+      aria-label="Buchtrailer: Vertreterbesuch unerwünscht - Door-to-Door Vertrieb meistern"
+    >
+      <source src="/assets/book-trailer-720p.mp4" type="video/mp4">
+      <img src="/assets/Cover-final.JPEG" alt="Buchcover: Vertreterbesuch unerwünscht – D2D Vertrieb Buch von Daniel Lahmer" style="width:100%">
+    </video>
+  </div>
+</div>
       </div>
     </section>
 
